@@ -1,0 +1,11 @@
+Tengo ProjectsList utilizando mocks ts, creame una pantalla utilizando componentes de shadcn y tailwind que va a mostrar una lista de proyectos.
+
+Hazme algo  ingenioso acerca de la lista de proyectos teniendo en cuenta que va a ser una lista de proyectos que podemos ver los detalles tal como hemos dicho, pero teniendo en cuenta que es una aplicacion para votar por dichos proyectos.
+
+Creame un componente projectDrawer que utilice Drawer de shadcn para mostrar la informacion de los proyectos es decir ver detalles con voton de votar y cancelar dentro deeste Drawer, que este colocado en la derecha.
+
+hazlo de nuevo pero utilizando solo lo que tenemos en mocks es decir, id titulo, descripcion, y createdAt el resto que has creado tu no lo pongas.
+
+hazlo de nuevo pero utilizando solo lo que tenemos en mocks es decir, id titulo, descripcion, y createdAt el resto que has creado tu no lo pongas.
+
+Ahora implementa un VotingDialog.tsx que sea un shadcn Dialog que tiene dentro un criterio numerico entre 0 y 10 y no implementes validacion por ahora

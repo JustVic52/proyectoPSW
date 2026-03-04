@@ -1,9 +1,10 @@
 import "./App.css";
+import ProjectsList from "./ProjectsList";
 
 function App() {
   return (
-    <div className="flex justify-center items-center h-screen">
-      <h1>Hola equipo</h1>
+    <div className="min-h-screen bg-background text-foreground">
+      <ProjectsList />
     </div>
   );
 }
