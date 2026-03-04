@@ -1,12 +1,33 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Layout from "./pages/Layout";
+import ProjectsList from "./components/ProjectsList";
+import Rankings from "./pages/Rankings";
+import Profile from "./pages/Profile";
 import "./App.css";
-import ProjectsList from "./ProjectsList";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <ProjectsList />,
+      },
+      {
+        path: "/rankings",
+        element: <Rankings />,
+      },
+      {
+        path: "/profile",
+        element: <Profile />,
+      },
+    ],
+  },
+]);
 
 function App() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <ProjectsList />
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
