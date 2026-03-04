@@ -9,3 +9,16 @@ hazlo de nuevo pero utilizando solo lo que tenemos en mocks es decir, id titulo,
 hazlo de nuevo pero utilizando solo lo que tenemos en mocks es decir, id titulo, descripcion, y createdAt el resto que has creado tu no lo pongas.
 
 Ahora implementa un VotingDialog.tsx que sea un shadcn Dialog que tiene dentro un criterio numerico entre 0 y 10 y no implementes validacion por ahora
+
+reemplaza el contenido de ProjectDrawer por un componente de shadcn Drawer y Drawer SI existe en shadcn
+
+Vale, la direccion quiero que aparezca el drawer por la derecha y además elimina el sheet.tsx dado que ya no es necesario
+
+Implementa un side bar en la izquierda con sideBar de shadcn que por ahora va a tener, lista de proyectos, rankings (solo un componente que tiene texto rankings), 
+y abajo del sidebar un enlaze de avatar que tiene un icono y te lleva a otra pagina que tiene un texto predefinido. Implementalo con reactRouter
+
+Modifica sidebar para que tenga un ancho minimo para que cuando este cerrado muestre un minimo, es decir, los iconos de cada funcionalidad, una copita para ranking el logo del perfil, etc...
+
+quita padding top de la pagina principal (proyectos) y haz que el boton para minimizar el sidebar sea fijo para que cuando scrolleemos hacia abajo siga siempre visible
+
+Quita este estilo flotante del boton minimizar y ponlo como un item del sidebar
