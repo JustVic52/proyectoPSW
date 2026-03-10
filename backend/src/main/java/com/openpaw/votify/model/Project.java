@@ -1,9 +1,15 @@
 package com.openpaw.votify.model;
 
+import com.openpaw.votify.factory.FactoryItem;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class Project {
+
+public class Project implements FactoryItem<Project, Project.Params> {
+    public record Params(String title, String description) {}
 
     private UUID id;
     private String title;
@@ -40,5 +46,23 @@ public class Project {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public Project create(ResultSet rs, int rowNum) throws SQLException {
+        Project p = new Project();
+        p.setId(UUID.fromString(rs.getString("id")));
+        p.setTitle(rs.getString("title"));
+        p.setDescription(rs.getString("description"));
+        p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        return p;
+    }
+
+    @Override
+    public Project create(Params params) {
+        Project project = new Project();
+        project.setTitle(params.title());
+        project.setDescription(params.description());
+        return project;
     }
 }

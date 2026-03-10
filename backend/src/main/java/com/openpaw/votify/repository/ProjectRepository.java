@@ -1,5 +1,6 @@
 package com.openpaw.votify.repository;
 
+import com.openpaw.votify.factory.Factory;
 import com.openpaw.votify.model.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,20 +11,18 @@ import java.util.UUID;
 
 @Repository
 public class ProjectRepository {
+    private final Factory<Project, Project.Params> projectFactory;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    public ProjectRepository(JdbcTemplate jdbcTemplate, Factory<Project, Project.Params> projectFactory) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.projectFactory = projectFactory;
+    }
+
     public List<Project> findAll() {
         String sql = "SELECT id, title, description, created_at FROM projects";
-
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            Project p = new Project();
-            p.setId(UUID.fromString(rs.getString("id")));
-            p.setTitle(rs.getString("title"));
-            p.setDescription(rs.getString("description"));
-            p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            return p;
-        });
+        return jdbcTemplate.query(sql, projectFactory::create);
     }
 }
