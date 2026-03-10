@@ -23,6 +23,6 @@ public class ProjectRepository {
 
     public List<Project> findAll() {
         String sql = "SELECT id, title, description, created_at FROM projects";
-        return jdbcTemplate.query(sql, projectFactory::create);
+        return jdbcTemplate.query(sql, projectFactory::fromResultSet);
     }
 }
