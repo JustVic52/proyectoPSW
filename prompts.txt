@@ -22,3 +22,6 @@ Modifica sidebar para que tenga un ancho minimo para que cuando este cerrado mue
 quita padding top de la pagina principal (proyectos) y haz que el boton para minimizar el sidebar sea fijo para que cuando scrolleemos hacia abajo siga siempre visible
 
 Quita este estilo flotante del boton minimizar y ponlo como un item del sidebar
+
+❯ actually i change my mind what we need is to implement factory pattern for projects
+❯ no, wait first think about that we would need to implement different factories so i was thinking about making it generic, also dont generate uuid this is the db responsibility, also i think i would it to be somethig like interface FactoryItem that needs to implement new function where i will have branchingfor different types
