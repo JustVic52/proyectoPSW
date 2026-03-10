@@ -1,1 +1,3 @@
 refact: translate model props to english
+
+refact: improve factory by removing unnecessary memory allocation
