@@ -15,7 +15,7 @@ public class ProjectRepository {
     private JdbcTemplate jdbcTemplate;
 
     public List<Project> findAll() {
-        String sql = "SELECT id, title, description, created_at FROM \"Project\"";
+        String sql = "SELECT id, title, description, created_at FROM projects";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Project p = new Project();
