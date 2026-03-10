@@ -1,0 +1,5 @@
+### GLOBAL ###
+.idea
+*.iws
+*.iml
+*.ipr
