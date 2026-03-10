@@ -6,8 +6,8 @@ import java.util.UUID;
 public class Project {
 
     private UUID id;
-    private String titulo;
-    private String descripcion;
+    private String title;
+    private String description;
     private LocalDateTime createdAt;
 
     public UUID getId() {
@@ -18,20 +18,20 @@ public class Project {
         this.id = id;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getCreatedAt() {

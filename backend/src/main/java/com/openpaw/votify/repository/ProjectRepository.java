@@ -20,8 +20,8 @@ public class ProjectRepository {
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Project p = new Project();
             p.setId(UUID.fromString(rs.getString("id")));
-            p.setTitulo(rs.getString("title"));
-            p.setDescripcion(rs.getString("description"));
+            p.setTitle(rs.getString("title"));
+            p.setDescription(rs.getString("description"));
             p.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
             return p;
         });
