@@ -1,5 +1,12 @@
-import { useState } from "react";
-import { projects } from "../mocks";
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+}
 import {
   Card,
   CardContent,
@@ -10,7 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Clock, CheckCircle } from "lucide-react";
+import { ChevronRight, Clock, CheckCircle, Loader2 } from "lucide-react";
 import ProjectDrawer from "./ProjectDrawer";
 import VotingDialog from "./VotingDialog";
 
@@ -22,16 +29,29 @@ const projectMeta: Record<string, { tag: string }> = {
 };
 
 export default function ProjectsList() {
-  const [selectedProject, setSelectedProject] = useState<
-    (typeof projects)[0] | null
-  >(null);
-  const [votingProject, setVotingProject] = useState<
-    (typeof projects)[0] | null
-  >(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [votingProject, setVotingProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/projects");
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Error al obtener los proyectos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const handleVoteSubmit = (score: number) => {
     alert(
-      `Has votado exitosamente por: "${votingProject?.titulo}" con una puntuación de: ${score}`,
+      `Has votado exitosamente por: "${votingProject?.title}" con una puntuación de: ${score}`,
     );
     setVotingProject(null);
   };
@@ -58,76 +78,84 @@ export default function ProjectsList() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {projects.map((project, index) => {
-          const meta = projectMeta[project.id] ?? { tag: "Proyecto" };
-          return (
-            <Card
-              key={project.id}
-              className="group pb-1 flex flex-col overflow-hidden border-border/50 shadow-sm hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 hover:border-border/80 transition-all duration-300 animate-fade-up bg-card"
-              style={{ animationDelay: `${80 + index * 80}ms` }}
-            >
-              <CardHeader
-                className="pb-3 cursor-pointer"
-                onClick={() => setSelectedProject(project)}
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-3 text-lg font-medium text-muted-foreground">Cargando proyectos...</span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {projects.map((project, index) => {
+            const meta = projectMeta[project.id] ?? { tag: "Proyecto" };
+            //console.log(project)
+            return (
+              <Card
+                key={project.id}
+                className="group pb-1 flex flex-col overflow-hidden border-border/50 shadow-sm hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 hover:border-border/80 transition-all duration-300 animate-fade-up bg-card"
+                style={{ animationDelay: `${80 + index * 80}ms` }}
               >
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <Badge
-                    variant="secondary"
-                    className="text-[11px] font-medium bg-muted/60 text-muted-foreground border border-border/40"
-                  >
-                    {meta.tag}
-                  </Badge>
-                </div>
-                <CardTitle className="text-[17px] font-bold leading-snug group-hover:text-primary transition-colors duration-200 line-clamp-2">
-                  {project.titulo}
-                </CardTitle>
-                <CardDescription className="flex items-center gap-1.5 text-xs mt-1">
-                  <Clock className="h-3 w-3" />
-                  {new Date(project.createdAt).toLocaleDateString("es-ES", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent
-                className="flex-1 cursor-pointer pt-0"
-                onClick={() => setSelectedProject(project)}
-              >
-                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                  {project.descripcion}
-                </p>
-              </CardContent>
-
-              <CardFooter className="border-t border-border/40 bg-muted/20 justify-between pt-1 [.border-t]:pt-4 pb-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10 text-[13px] font-medium"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setVotingProject(project);
-                  }}
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Votar
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 text-[13px] border-border/60 hover:border-primary/50 hover:bg-primary/8 hover:text-primary transition-all"
+                <CardHeader
+                  className="pb-3 cursor-pointer"
                   onClick={() => setSelectedProject(project)}
                 >
-                  Detalles
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </Button>
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <Badge
+                      variant="secondary"
+                      className="text-[11px] font-medium bg-muted/60 text-muted-foreground border border-border/40"
+                    >
+                      {meta.tag}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-[17px] font-bold leading-snug group-hover:text-primary transition-colors duration-200 line-clamp-2">
+                    {project.title}
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-1.5 text-xs mt-1">
+                    <Clock className="h-3 w-3" />
+                    {new Date(project.createdAt).toLocaleDateString("es-ES", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent
+                  className="flex-1 cursor-pointer pt-0"
+                  onClick={() => setSelectedProject(project)}
+                >
+                  <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                    {project.description}
+                  </p>
+                </CardContent>
+
+                <CardFooter className="border-t border-border/40 bg-muted/20 justify-between pt-1 [.border-t]:pt-4 pb-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10 text-[13px] font-medium"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setVotingProject(project);
+                    }}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    Votar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 text-[13px] border-border/60 hover:border-primary/50 hover:bg-primary/8 hover:text-primary transition-all"
+                    onClick={() => setSelectedProject(project)}
+                  >
+                    Detalles
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       <ProjectDrawer
         isOpen={!!selectedProject}
@@ -139,7 +167,7 @@ export default function ProjectsList() {
       <VotingDialog
         isOpen={!!votingProject}
         onClose={() => setVotingProject(null)}
-        projectTitle={votingProject?.titulo || ""}
+        projectTitle={votingProject?.title || ""}
         onVoteSubmit={handleVoteSubmit}
       />
     </div>
