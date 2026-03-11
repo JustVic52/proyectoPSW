@@ -1,8 +1,7 @@
 package com.openpaw.votify.repository;
 
-import com.openpaw.votify.factory.Factory;
+import com.openpaw.votify.factory.ProjectFactory;
 import com.openpaw.votify.model.Project;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -10,12 +9,10 @@ import java.util.List;
 
 @Repository
 public class ProjectRepository {
-    private final Factory<Project, Project.Params> projectFactory;
+    private final JdbcTemplate jdbcTemplate;
+    private final ProjectFactory projectFactory;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    public ProjectRepository(JdbcTemplate jdbcTemplate, Factory<Project, Project.Params> projectFactory) {
+    public ProjectRepository(JdbcTemplate jdbcTemplate, ProjectFactory projectFactory) {
         this.jdbcTemplate = jdbcTemplate;
         this.projectFactory = projectFactory;
     }
