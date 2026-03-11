@@ -11,4 +11,6 @@ public class FactoryConfig {
     public Factory<Project, Project.Params> projectFactory() {
         return new Factory<>(Project::new);
     }
+
+    // Add a new bean here for each class that implements Creatable
 }
