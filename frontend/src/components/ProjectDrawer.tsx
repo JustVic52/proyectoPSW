@@ -8,16 +8,12 @@ import {
     DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { Project } from "./ProjectsList";
 
 type ProjectDrawerProps = {
     isOpen: boolean;
     onClose: () => void;
-    project: {
-        id: string;
-        titulo: string;
-        descripcion: string;
-        createdAt: string;
-    } | null;
+    project: Project | null;
     onVoteClick: () => void;
 };
 
@@ -28,7 +24,7 @@ export default function ProjectDrawer({ isOpen, onClose, project, onVoteClick }:
         <Drawer open={isOpen} onOpenChange={onClose} direction="right">
             <DrawerContent className="flex flex-col bg-background shadow-2xl">
                 <DrawerHeader className="text-left border-b border-border/40 pb-4">
-                    <DrawerTitle className="text-3xl font-bold">{project.titulo}</DrawerTitle>
+                    <DrawerTitle className="text-3xl font-bold">{project.title}</DrawerTitle>
                     <DrawerDescription className="text-base mt-2">
                         <span className="block text-sm">Fecha: {new Date(project.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </DrawerDescription>
@@ -37,7 +33,7 @@ export default function ProjectDrawer({ isOpen, onClose, project, onVoteClick }:
                 <div className="flex-1 overflow-y-auto p-6">
                     <h3 className="font-semibold text-lg mb-3">Descripción</h3>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                        {project.descripcion}
+                        {project.description}
                     </p>
                 </div>
 
