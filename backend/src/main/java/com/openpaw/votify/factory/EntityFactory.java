@@ -1,5 +1,7 @@
 package com.openpaw.votify.factory;
 
+import com.openpaw.votify.model.Project;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

@@ -1,6 +1,5 @@
 package com.openpaw.votify.model;
 
-import com.openpaw.votify.factory.Creatable;
 import com.openpaw.votify.utils.CriterionType;
 
 import java.sql.ResultSet;
@@ -10,7 +9,7 @@ import java.util.UUID;
 
 import static com.openpaw.votify.utils.CriterionType.*;
 
-public class Criterion implements Creatable<Criterion, Criterion.Params> {
+public class Criterion {
     public record Params(String name, CriterionType type, float weight) {}
 
     private UUID id;
@@ -44,19 +43,7 @@ public class Criterion implements Creatable<Criterion, Criterion.Params> {
 
     public void setScaleID(UUID scaleID) { this.scaleID = scaleID; }
 
-    @Override
-    public Criterion fromResultSet(ResultSet rs, int rowNum) throws SQLException {
-        Criterion c = new Criterion();
-        c.setId(UUID.fromString(rs.getString("id")));
-        c.setName(rs.getString("name"));
-        c.setWeight(rs.getFloat("weight"));
-        c.setType(ConvertCriterionType(rs.getString("criterion_type")));
-        c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        c.setScaleID(UUID.fromString(rs.getString("scale_id")));
-        return c;
-    }
-
-    private CriterionType ConvertCriterionType(String dbType) {
+    public CriterionType convertCriterionType(String dbType) {
         CriterionType tempType;
         switch (dbType) {
             case "multiple_choice":
@@ -70,15 +57,6 @@ public class Criterion implements Creatable<Criterion, Criterion.Params> {
                 break;
         }
         return tempType;
-    }
-
-    @Override
-    public Criterion fromParams(Params params) {
-        Criterion c = new Criterion();
-        c.setName(params.name());
-        c.setType(params.type());
-        c.setWeight(params.weight());
-        return c;
     }
 
 }

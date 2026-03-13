@@ -1,8 +1,7 @@
 package com.openpaw.votify.repository;
 
-import com.openpaw.votify.factory.Factory;
+import com.openpaw.votify.factory.CriterionFactory;
 import com.openpaw.votify.model.Criterion;
-import com.openpaw.votify.model.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,12 +10,12 @@ import java.util.List;
 
 @Repository
 public class CriterionRepository {
-    private final Factory<Criterion, Criterion.Params> criterionFactory;
+    private final CriterionFactory criterionFactory;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public CriterionRepository(JdbcTemplate jdbcTemplate, Factory<Criterion, Criterion.Params> criterionFactory) {
+    public CriterionRepository(JdbcTemplate jdbcTemplate, CriterionFactory criterionFactory) {
         this.jdbcTemplate = jdbcTemplate;
         this.criterionFactory = criterionFactory;
     }
