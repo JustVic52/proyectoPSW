@@ -18,6 +18,7 @@ public class Criterion implements Creatable<Criterion, Criterion.Params> {
     private String name;
     private float weight;
     private CriterionType type;
+    private UUID scaleID;
 
     public UUID getId() { return id; }
 
@@ -39,6 +40,10 @@ public class Criterion implements Creatable<Criterion, Criterion.Params> {
 
     public void setType(CriterionType type) { this.type = type; }
 
+    public UUID getScaleID() { return scaleID; }
+
+    public void setScaleID(UUID scaleID) { this.scaleID = scaleID; }
+
     @Override
     public Criterion fromResultSet(ResultSet rs, int rowNum) throws SQLException {
         Criterion c = new Criterion();
@@ -47,6 +52,7 @@ public class Criterion implements Creatable<Criterion, Criterion.Params> {
         c.setWeight(rs.getFloat("weight"));
         c.setType(ConvertCriterionType(rs.getString("criterion_type")));
         c.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        c.setScaleID(UUID.fromString(rs.getString("scale_id")));
         return c;
     }
 
