@@ -11,10 +11,10 @@ public class FactoryConfig {
     // Add a new bean here for each class that implements Creatable
 
     @Bean
-    public Factory<Project, Project.Params> projectFactory() {
+    public ProjectFactory projectFactory() {
         return new Factory<>(Project::new);
     }
 
     @Bean
-    public Factory<Criterion, Criterion.Params> criterionFactory() { return new Factory<>(Criterion::new); }
+    public CriterionFactory criterionFactory() { return new Factory<>(Criterion::new); }
 }

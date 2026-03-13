@@ -37,7 +37,7 @@ export default function ProjectsList() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/projects");
+        const response = await axios.get("http://localhost:8085/api/projects");
         setProjects(response.data);
       } catch (error) {
         console.error("Error al obtener los proyectos:", error);
