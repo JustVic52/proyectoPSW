@@ -3,3 +3,7 @@ refact: translate model props to english
 refact: improve factory by removing unnecessary memory allocation
 
 refact: improve and simplify factory pattern
+
+refact: replace manual creating of vote with vote factory
+
+refact: refactor vote classes to have 3 classes

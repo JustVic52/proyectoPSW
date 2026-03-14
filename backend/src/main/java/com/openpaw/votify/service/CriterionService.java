@@ -16,4 +16,8 @@ public class CriterionService {
     public List<Criterion> getCriteria() {
         return criterionRepository.findAll();
     }
+
+    public Criterion addCriterion(Criterion.Params params) {
+        return criterionRepository.add(params);
+    }
 }

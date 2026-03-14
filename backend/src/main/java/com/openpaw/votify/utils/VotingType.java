@@ -1,7 +1,7 @@
 package com.openpaw.votify.utils;
 
 public enum VotingType {
-    POINT_BASED,
+    SCORE_BASED,
     JURY_BASED,
-    MIXED
+    SCORE_JURY_BASED
 }

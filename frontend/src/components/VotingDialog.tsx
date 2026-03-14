@@ -7,6 +7,16 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,19 +30,30 @@ type VotingDialogProps = {
 
 export default function VotingDialog({ isOpen, onClose, projectTitle, onVoteSubmit }: VotingDialogProps) {
     const [score, setScore] = useState<string>("");
+    const [showConfirmAlert, setShowConfirmAlert] = useState<boolean>(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const numericScore = parseFloat(score);
         // Validacion simple requerida por el input html aunque no lo pidan estrictamente
         if (!isNaN(numericScore)) {
+            // Mostrar AlertDialog en lugar de enviar directamente
+            setShowConfirmAlert(true);
+        }
+    };
+
+    const handleConfirmVote = () => {
+        const numericScore = parseFloat(score);
+        if (!isNaN(numericScore)) {
             onVoteSubmit(numericScore);
             setScore("");
+            setShowConfirmAlert(false);
         }
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <>
+            <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Vota por el proyecto</DialogTitle>
@@ -67,5 +88,21 @@ export default function VotingDialog({ isOpen, onClose, projectTitle, onVoteSubm
                 </form>
             </DialogContent>
         </Dialog>
+
+        <AlertDialog open={showConfirmAlert} onOpenChange={setShowConfirmAlert}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>¿Confirmar votación?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Estás a punto de enviar un voto con puntuación de <strong className="text-foreground">{score}</strong> para el proyecto <strong className="text-foreground">{projectTitle}</strong>. ¿Deseas continuar?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setShowConfirmAlert(false)}>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmVote}>Confirmar Voto</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    </>
     );
 }

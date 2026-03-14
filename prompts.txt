@@ -28,3 +28,30 @@ Quita este estilo flotante del boton minimizar y ponlo como un item del sidebar
 
 ❯ look at this backend i still cant accept that i cant make my factory work with inherited classes which could have different arguments
 Añade un estado de carga hasta que llegen los datos de fetch en el frontend
+
+Vale, hasta ahora nuestra pantalla principal era la ProjectList, donde salen la lista de proyectos, bien, vamos a empezar con lo gordo, El flujo ha de serUna lista de eventos, cada evento tendra una vez dentro otra pantalla con la lista de categorias y ya cada categoria tendra la Lista de proyectos que participan, ten en cuenta que un proyecto puede estar en varias categorias o en una sola, asi que vamos a crear ese flujo de pantallas con lo que tenemos hasta ahora, para ello crea como Dos eventos que sean falsos porque aun no hemos creado eventos en el backend ni en la BD, que en ese evento esten categorias y en cada categoria tengamos la ProjectList con distiontos proyectos en cada uno coincidiando alguno sabiendo lo que te he dicho que pueden participar en varias categorias o solo en una. usa todo lo que tenemos hasta ahora sin modificar NADA  de lo que ya esta solo aladiendo ese flujo de pantallas nuevas aqui tienes ayuda:
+
+1. Pantalla: Explorador de Eventos (/eventos)Esta será la puerta de entrada. 
+Un usuario (o superusuario) verá los eventos disponibles. Según tu diagrama UML, 
+un evento tiene estados (CONFIGURACION, VOTACION, CERRADO) y fechas.Recomendación de Diseño (UI/UX):
+Diseño: Usa una cuadrícula (grid) de tarjetas (Card de Shadcn).Información por tarjeta:Título y descripción del evento.
+Un Badge (etiqueta) de Shadcn en la esquina superior para indicar el estado (ej. Verde para "Votación Abierta", Gris para "Cerrado", Amarillo para 
+"Configuración").Fechas de inicio y fin (fechaInicio, fechaFin).Interacción: Al hacer clic en la tarjeta o en un botón "Ver Categorías", 
+navegas a la ruta del evento (/eventos/[id_evento]).2. Pantalla: Detalle del Evento y Categorías (/eventos/[id_evento])Una vez dentro del evento, 
+el usuario debe ver en qué categorías puede participar o votar. El documento menciona que puede haber varias categorías y tipos de votación en un mismo evento 
+(ej. "Proyectos Sociales" y "Proyectos Culturales", o voto experto vs. voto popular).
+Recomendación de Diseño (UI/UX):Cabecera (Header): Un Hero section o un bloque superior que muestre 
+el título del Evento grande y un resumen.Lista de Categorías: Aquí tienes dos opciones visuales muy buenas:
+Opción A (Tarjetas - Recomendado si hay muchas): Otra cuadrícula de tarjetas. Cada tarjeta es una Categoría. 
+Debería mostrar el nombre de la categoría, el tipo de votación asociada (Puntos vs Popular) y el tiempo restante 
+(fechaApertura / fechaCierre de la tabla votings).Opción B (Tabs de Shadcn - Recomendado si son 2 o 3 categorías): 
+Como hiciste en el perfil, unas pestañas horizontales. Al hacer clic en la pestaña "Proyectos Sociales", 
+renderizas directamente tu componente actual de "Lista de Proyectos" debajo.3. Conexión con tu pantalla actual 
+(Lista de Proyectos)Tu pantalla actual se convertirá en el "tercer nivel" (/eventos/[id_evento]/categorias/[id_categoria]). 
+Al entrar aquí, el sistema filtrará los proyectos basándose en la relación Categoría <-> 
+Proyecto (que en tu UML es de many-to-many y en tu DB se refleja en los cruces).
+
+
+❯ okay in this setup we need to models about votes one which voters ids and other without voters ids
+
+❯ okay now, i want you to think what you did with votes why did you create Vote, VoteResponse, VoteResult, and anonymous vote result i dont think you need all of them
