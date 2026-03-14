@@ -1,6 +1,7 @@
 package com.openpaw.votify.repository;
 
 import com.openpaw.votify.exception.NotFoundException;
+import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.CriterionValue;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
@@ -57,7 +58,7 @@ public class VoteRepository {
         }
     }
 
-    public Vote add(Vote.Params params) {
+    public Vote add(AnonymousVote.Params params) {
         String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment) VALUES (?::uuid, ?::uuid, ?::uuid, ?) RETURNING *";
         return jdbcTemplate.queryForObject(sql, this::mapRow,
                 Vote.PLACEHOLDER_VOTER_ID.toString(),
@@ -67,7 +68,7 @@ public class VoteRepository {
     }
 
     public VoteResponse addWithCriteria(VoteResponse.Params params) {
-        Vote vote = add(new Vote.Params(
+        Vote vote = add(new AnonymousVote.Params(
                 params.projectId(),
                 params.votingSessionId(),
                 params.comment()));

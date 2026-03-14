@@ -53,3 +53,5 @@ Proyecto (que en tu UML es de many-to-many y en tu DB se refleja en los cruces).
 
 
 ❯ okay in this setup we need to models about votes one which voters ids and other without voters ids
+
+❯ okay now, i want you to think what you did with votes why did you create Vote, VoteResponse, VoteResult, and anonymous vote result i dont think you need all of them

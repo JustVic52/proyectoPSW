@@ -1,10 +1,9 @@
 package com.openpaw.votify.service;
 
 import com.openpaw.votify.factory.VoteFactory;
-import com.openpaw.votify.model.AnonymousVoteResult;
+import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
-import com.openpaw.votify.model.VoteResult;
 import com.openpaw.votify.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,39 +22,32 @@ public class VoteService {
     private VoteFactory voteFactory;
 
     private Map<String, Object> toMap(Vote vote) {
-        return Map.of(
-                "id", vote.getId(),
-                "voterId", vote.getVoterId(),
-                "projectId", vote.getProjectId(),
-                "votingSessionId", vote.getVotingSessionId(),
-                "comment", vote.getComment() != null ? vote.getComment() : "",
-                "createdAt", vote.getCreatedAt()
-        );
+        return Map.of("vote", vote);
     }
 
-    public List<AnonymousVoteResult> getAllAnonymousVotes() {
+    public List<AnonymousVote> getAllAnonymousVotes() {
         return voteRepository.findAll().stream()
-                .map(v -> (AnonymousVoteResult) voteFactory.create("anonymous", toMap(v)))
+                .map(v -> voteFactory.create("anonymous", toMap(v)))
                 .toList();
     }
 
-    public List<VoteResult> getAllVotes() {
+    public List<Vote> getAllVotes() {
         return voteRepository.findAll().stream()
-                .map(v -> (VoteResult) voteFactory.create("full", toMap(v)))
+                .map(v -> (Vote) voteFactory.create("full", toMap(v)))
                 .toList();
     }
 
-    public AnonymousVoteResult addVote(Vote.Params params) {
+    public AnonymousVote addVote(AnonymousVote.Params params) {
         Vote vote = voteRepository.add(params);
-        return (AnonymousVoteResult) voteFactory.create("anonymous", toMap(vote));
+        return voteFactory.create("anonymous", toMap(vote));
     }
 
     public VoteResponse addVoteWithCriteria(VoteResponse.Params params) {
         return voteRepository.addWithCriteria(params);
     }
 
-    public VoteResult removeVote(UUID id) {
+    public Vote removeVote(UUID id) {
         Vote vote = voteRepository.remove(id);
-        return (VoteResult) voteFactory.create("full", toMap(vote));
+        return (Vote) voteFactory.create("full", toMap(vote));
     }
 }
