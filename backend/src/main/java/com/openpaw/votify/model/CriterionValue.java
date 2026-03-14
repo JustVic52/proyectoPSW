@@ -10,6 +10,9 @@ public class CriterionValue {
     private UUID voteId;
     private float numericValue;
 
+    private Criterion criterion;
+    private Vote vote;
+
     public UUID getId() {
         return id;
     }
@@ -33,5 +36,17 @@ public class CriterionValue {
     }
     public void setNumericValue(float numericValue) {
         this.numericValue = numericValue;
+    }
+    public Criterion getCriterion() {
+        return criterion;
+    }
+    public void setCriterion(Criterion criterion) {
+        this.criterion = criterion;
+    }
+    public Vote getVote() {
+        return vote;
+    }
+    public void setVote(Vote vote) {
+        this.vote = vote;
     }
 }

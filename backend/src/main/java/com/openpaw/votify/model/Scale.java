@@ -1,5 +1,6 @@
 package com.openpaw.votify.model;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Scale {
@@ -10,6 +11,9 @@ public class Scale {
     private String description;
     private java.time.LocalDateTime createdAt;
     
+    private Voting voting;
+    private List<Criterion> criterions = new java.util.ArrayList<>();
+
     public UUID getId() {
         return id;
     }
@@ -34,4 +38,22 @@ public class Scale {
     public void setCreatedAt(java.time.LocalDateTime createdAt) {
         this.createdAt = createdAt;
     } 
+    public Voting getVoting() {
+        return voting;
+    }
+    public void setVoting(Voting voting) {
+        this.voting = voting;
+    }
+    public List<Criterion> getCriterions() {
+        return criterions;
+    }
+    public void setCriterions(List<Criterion> criterions) {
+        this.criterions = criterions;
+    }
+    public void addCriterion(Criterion criterion) {
+        this.criterions.add(criterion);
+    }
+    public void removeCriterion(Criterion criterion) {
+        this.criterions.remove(criterion);
+    }
 }

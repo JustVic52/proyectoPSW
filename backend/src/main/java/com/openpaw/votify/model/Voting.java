@@ -15,6 +15,9 @@ public class Voting {
     private java.time.LocalDateTime starTime;
     private java.time.LocalDateTime endTime;
     
+    private Category category;
+    private Scale scale;
+
     public UUID getId() {
         return id;
     }
@@ -57,6 +60,16 @@ public class Voting {
     public void setEndTime(java.time.LocalDateTime endTime) {
         this.endTime = endTime;
     }
-
-    
+    public Category getCategory() {
+        return category;
+    }
+    public void setCategory(Category category) {
+        this.category = category;
+    }   
+    public Scale getScale() {
+        return scale;
+    }
+    public void setScale(Scale scale) {
+        this.scale = scale;
+    }
 }

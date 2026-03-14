@@ -10,6 +10,9 @@ public class CategoryScore {
     private UUID categoryId;
     private float score;
 
+    private Project project;
+    private Category category;
+
     public UUID getId() {
         return id;
     }
@@ -33,5 +36,17 @@ public class CategoryScore {
     }
     public void setScore(float score) {
         this.score = score;
+    }
+    public Project getProject() {
+        return project;
+    }
+    public void setProject(Project project) {
+        this.project = project;
+    }
+    public Category getCategory() {
+        return category;
+    }
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
