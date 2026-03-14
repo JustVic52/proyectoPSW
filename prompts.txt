@@ -50,3 +50,6 @@ renderizas directamente tu componente actual de "Lista de Proyectos" debajo.3. C
 (Lista de Proyectos)Tu pantalla actual se convertirá en el "tercer nivel" (/eventos/[id_evento]/categorias/[id_categoria]). 
 Al entrar aquí, el sistema filtrará los proyectos basándose en la relación Categoría <-> 
 Proyecto (que en tu UML es de many-to-many y en tu DB se refleja en los cruces).
+
+
+❯ okay in this setup we need to models about votes one which voters ids and other without voters ids

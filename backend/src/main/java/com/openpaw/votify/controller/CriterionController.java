@@ -4,9 +4,9 @@ import com.openpaw.votify.model.Criterion;
 import com.openpaw.votify.service.CriterionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import java.util.List;
 
@@ -22,4 +22,8 @@ public class CriterionController {
         return ResponseEntity.ok(criterionService.getCriteria());
     }
 
+    @PostMapping
+    public ResponseEntity<Criterion> addCriterion(@RequestBody Criterion.Params params) {
+        return ResponseEntity.status(201).body(criterionService.addCriterion(params));
+    }
 }

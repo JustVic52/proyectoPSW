@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class Project {
-    public record Params(String title, String description) {}
+    public record Params(UUID categoryId, String title, String description) {}
 
     private UUID id;
     private String title;
