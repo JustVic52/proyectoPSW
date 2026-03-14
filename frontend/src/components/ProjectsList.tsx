@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Clock, CheckCircle, Loader2 } from "lucide-react";
 import ProjectDrawer from "./ProjectDrawer";
 import VotingDialog from "./VotingDialog";
+import { toast } from "sonner";
 
 const projectMeta: Record<string, { tag: string }> = {
   "1": { tag: "Educación" },
@@ -50,9 +51,13 @@ export default function ProjectsList() {
   }, []);
 
   const handleVoteSubmit = (score: number) => {
-    alert(
-      `Has votado exitosamente por: "${votingProject?.title}" con una puntuación de: ${score}`,
-    );
+    toast(<span className="font-bold">Votify</span>, {
+      description: (
+        <span className="text-black font-normal">
+          🎉 Has votado exitosamente por: "{votingProject?.title}" con una puntuación de: {score} 🎉
+        </span>
+      ),
+    });
     setVotingProject(null);
   };
 

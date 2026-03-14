@@ -1,4 +1,4 @@
-import { Home, Trophy } from "lucide-react";
+import { Home, Trophy, CalendarDays } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
     Sidebar,
@@ -15,6 +15,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const items = [
+    {
+        title: "Eventos",
+        url: "/eventos",
+        icon: CalendarDays,
+    },
     {
         title: "Proyectos",
         url: "/",
