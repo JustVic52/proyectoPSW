@@ -1,10 +1,9 @@
 package com.openpaw.votify.model;
 
 import com.openpaw.votify.utils.CriterionType;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.openpaw.votify.utils.CriterionType.*;
@@ -18,6 +17,9 @@ public class Criterion {
     private float weight;
     private CriterionType type;
     private UUID scaleID;
+
+    private List<CriterionValue> criterionValues = new ArrayList<>();
+    private Scale scale;
 
     public UUID getId() { return id; }
 
@@ -42,6 +44,14 @@ public class Criterion {
     public UUID getScaleID() { return scaleID; }
 
     public void setScaleID(UUID scaleID) { this.scaleID = scaleID; }
+
+    public List<CriterionValue> getCriterionValues() { return criterionValues; }
+    public void setCriterionValues(List<CriterionValue> criterionValues) { this.criterionValues = criterionValues; }
+    public void addCriterionValue(CriterionValue criterionValue) { this.criterionValues.add(criterionValue); }
+    public void removeCriterionValue(CriterionValue criterionValue) { this.criterionValues.remove(criterionValue); }
+
+    public Scale getScale() { return scale; }
+    public void setScale(Scale scale) { this.scale = scale; }   
 
     public CriterionType convertCriterionType(String dbType) {
         CriterionType tempType;
