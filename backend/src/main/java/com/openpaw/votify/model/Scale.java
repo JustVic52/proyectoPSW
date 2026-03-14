@@ -1,18 +1,18 @@
 package com.openpaw.votify.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public class Scale {
-    public record Params(UUID voteId, String description) {}
+    public record Params(UUID votingSessionId, String description) {}
 
     private UUID id;
-    private UUID voteId;
+    private UUID votingSessionId;
     private String description;
-    private java.time.LocalDateTime createdAt;
+    private LocalDateTime createdAt;
     
-    private Voting voting;
-    private List<Criterion> criterions = new java.util.ArrayList<>();
+    private List<Criterion> criteria = new java.util.ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -20,11 +20,11 @@ public class Scale {
     public void setId(UUID id) {
         this.id = id;
     }
-    public UUID getVoteId() {
-        return voteId;
+    public UUID getVotingSessionId() {
+        return votingSessionId;
     }
-    public void setVoteId(UUID voteId) {
-        this.voteId = voteId;
+    public void setVotingSessionId(UUID votingSessionId) {
+        this.votingSessionId = votingSessionId;
     }
     public String getDescription() {
         return description;
@@ -32,28 +32,22 @@ public class Scale {
     public void setDescription(String description) {
         this.description = description;
     }
-    public java.time.LocalDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     } 
-    public Voting getVoting() {
-        return voting;
+    public List<Criterion> getCriteria() {
+        return criteria;
     }
-    public void setVoting(Voting voting) {
-        this.voting = voting;
+    public void setCriteria(List<Criterion> criteria) {
+        this.criteria = criteria;
     }
-    public List<Criterion> getCriterions() {
-        return criterions;
+    public void addCriteria(Criterion criterion) {
+        this.criteria.add(criterion);
     }
-    public void setCriterions(List<Criterion> criterions) {
-        this.criterions = criterions;
-    }
-    public void addCriterion(Criterion criterion) {
-        this.criterions.add(criterion);
-    }
-    public void removeCriterion(Criterion criterion) {
-        this.criterions.remove(criterion);
+    public void removeCriteria(Criterion criterion) {
+        this.criteria.remove(criterion);
     }
 }
