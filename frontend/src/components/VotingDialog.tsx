@@ -1,108 +1,131 @@
 import { useState } from "react";
+import axios from "axios";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ConfirmVoteAlert from "./ConfirmVoteAlert";
+import { Textarea } from "./ui/textarea";
+
+const PROJECT_ID = "74c900c4-d97d-4a63-a67c-e5f97073f68a";
+const VOTING_SESSION_ID = "65d27a35-3eba-4601-8fde-4b5e1432a993";
+const CRITERION_ID = "fd2db0ef-943d-4a2f-8eac-9b83a8bae209";
 
 type VotingDialogProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    projectTitle: string;
-    onVoteSubmit: (score: number) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  projectTitle: string;
 };
 
-export default function VotingDialog({ isOpen, onClose, projectTitle, onVoteSubmit }: VotingDialogProps) {
-    const [score, setScore] = useState<string>("");
-    const [showConfirmAlert, setShowConfirmAlert] = useState<boolean>(false);
+export default function VotingDialog({
+  isOpen,
+  onClose,
+  projectTitle,
+}: VotingDialogProps) {
+  const [comment, setComment] = useState("");
+  const [score, setScore] = useState<string>("");
+  const [showConfirmAlert, setShowConfirmAlert] = useState<boolean>(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const numericScore = parseFloat(score);
-        // Validacion simple requerida por el input html aunque no lo pidan estrictamente
-        if (!isNaN(numericScore)) {
-            // Mostrar AlertDialog en lugar de enviar directamente
-            setShowConfirmAlert(true);
-        }
-    };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const numericScore = parseFloat(score);
+    // Validacion simple requerida por el input html aunque no lo pidan estrictamente
+    if (!isNaN(numericScore)) {
+      // Mostrar AlertDialog en lugar de enviar directamente
+      setShowConfirmAlert(true);
+    }
+  };
 
-    const handleConfirmVote = () => {
-        const numericScore = parseFloat(score);
-        if (!isNaN(numericScore)) {
-            onVoteSubmit(numericScore);
-            setScore("");
-            setShowConfirmAlert(false);
-        }
-    };
+  const handleConfirmVote = async () => {
+    const numericScore = parseFloat(score);
+    if (!isNaN(numericScore)) {
+      await axios.post("http://localhost:8085/api/vote", {
+        projectId: PROJECT_ID,
+        votingSessionId: VOTING_SESSION_ID,
+        comment,
+        criterionValues: [
+          { criterionId: CRITERION_ID, numericValue: numericScore },
+        ],
+      });
+      setScore("");
+      setComment("");
+      setShowConfirmAlert(false);
+      onClose();
+    }
+  };
 
-    return (
-        <>
-            <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>Vota por el proyecto</DialogTitle>
-                    <DialogDescription>
-                        Estás a punto de valorar: <strong className="text-foreground">{projectTitle}</strong>.
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-4 py-4">
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="score">Puntuación (0 al 10)</Label>
-                            <Input
-                                id="score"
-                                type="number"
-                                min="0"
-                                max="10"
-                                step="any"
-                                value={score}
-                                onChange={(e) => setScore(e.target.value)}
-                                placeholder="Ejemplo: 8.5"
-                                className="col-span-3"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter className="sm:justify-between items-center flex-col sm:flex-row gap-2">
-                        <Button type="button" variant="secondary" onClick={onClose} className="w-full sm:w-auto">
-                            Cancelar
-                        </Button>
-                        <Button type="submit" className="w-full sm:w-auto">Confirmar Voto</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Vota por el proyecto</DialogTitle>
+            <DialogDescription>
+              Estás a punto de valorar:{" "}
+              <strong className="text-foreground">{projectTitle}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-6 py-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="score">Puntuación (0 al 10)</Label>
+                <Input
+                  id="score"
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="any"
+                  value={score}
+                  onChange={(e) => setScore(e.target.value)}
+                  placeholder="Ejemplo: 8.5"
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="score">Comment</Label>
+                <Textarea
+                  id="comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="I really liked the presentation"
+                  className="col-span-3"
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter className="sm:justify-between items-center flex-col sm:flex-row gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={onClose}
+                className="w-full sm:w-auto"
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" className="w-full sm:w-auto">
+                Confirmar Voto
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-        <AlertDialog open={showConfirmAlert} onOpenChange={setShowConfirmAlert}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>¿Confirmar votación?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Estás a punto de enviar un voto con puntuación de <strong className="text-foreground">{score}</strong> para el proyecto <strong className="text-foreground">{projectTitle}</strong>. ¿Deseas continuar?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setShowConfirmAlert(false)}>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleConfirmVote}>Confirmar Voto</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+      <ConfirmVoteAlert
+        showConfirmAlert={showConfirmAlert}
+        setShowConfirmAlert={setShowConfirmAlert}
+        score={score}
+        projectTitle={projectTitle}
+        comment={comment}
+        handleConfirmVote={handleConfirmVote}
+      />
     </>
-    );
+  );
 }
