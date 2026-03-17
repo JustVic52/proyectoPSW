@@ -5,6 +5,7 @@ import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.CriterionValue;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
+import com.openpaw.votify.exception.LengthExceededException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -59,12 +60,19 @@ public class VoteRepository {
     }
 
     public Vote add(AnonymousVote.Params params) {
-        String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment) VALUES (?::uuid, ?::uuid, ?::uuid, ?) RETURNING *";
-        return jdbcTemplate.queryForObject(sql, this::mapRow,
-                Vote.PLACEHOLDER_VOTER_ID.toString(),
-                params.projectId().toString(),
-                params.votingSessionId().toString(),
-                params.comment());
+        if (isCommentShortEnough(params.comment())) {
+            String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment) VALUES (?::uuid, ?::uuid, ?::uuid, ?) RETURNING *";
+            return jdbcTemplate.queryForObject(sql, this::mapRow,
+                    Vote.PLACEHOLDER_VOTER_ID.toString(),
+                    params.projectId().toString(),
+                    params.votingSessionId().toString(),
+                    params.comment());
+        }
+        else { throw new LengthExceededException("Comment is too long; 500 characters max."); }
+    }
+
+    private boolean isCommentShortEnough(String comment) {
+        return comment.length() <= 500;
     }
 
     public VoteResponse addWithCriteria(VoteResponse.Params params) {
