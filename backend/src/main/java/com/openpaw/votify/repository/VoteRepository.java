@@ -5,6 +5,7 @@ import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.CriterionValue;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
+import com.openpaw.votify.exception.LengthExceededException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -67,7 +68,7 @@ public class VoteRepository {
                     params.votingSessionId().toString(),
                     params.comment());
         }
-        else { return null; }
+        else { throw new LengthExceededException("Comment is too long; 500 characters max."); }
     }
 
     private boolean isCommentShortEnough(String comment) {

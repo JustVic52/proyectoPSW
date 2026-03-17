@@ -1,6 +1,7 @@
 package com.openpaw.votify.controller;
 
 import com.openpaw.votify.exception.ErrorResponse;
+import com.openpaw.votify.exception.LengthExceededException;
 import com.openpaw.votify.exception.NotFoundException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +36,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception e) {
         return ResponseEntity.status(500).body(new ErrorResponse("Unexpected error: " + e.getMessage()));
+    }
+
+    @ExceptionHandler(LengthExceededException.class)
+    public ResponseEntity<ErrorResponse> handleLength(LengthExceededException e) {
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 }
