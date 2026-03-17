@@ -59,12 +59,19 @@ public class VoteRepository {
     }
 
     public Vote add(AnonymousVote.Params params) {
-        String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment) VALUES (?::uuid, ?::uuid, ?::uuid, ?) RETURNING *";
-        return jdbcTemplate.queryForObject(sql, this::mapRow,
-                Vote.PLACEHOLDER_VOTER_ID.toString(),
-                params.projectId().toString(),
-                params.votingSessionId().toString(),
-                params.comment());
+        if (isCommentShortEnough(params.comment())) {
+            String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment) VALUES (?::uuid, ?::uuid, ?::uuid, ?) RETURNING *";
+            return jdbcTemplate.queryForObject(sql, this::mapRow,
+                    Vote.PLACEHOLDER_VOTER_ID.toString(),
+                    params.projectId().toString(),
+                    params.votingSessionId().toString(),
+                    params.comment());
+        }
+        else { return null; }
+    }
+
+    private boolean isCommentShortEnough(String comment) {
+        return comment.length() <= 500;
     }
 
     public VoteResponse addWithCriteria(VoteResponse.Params params) {
