@@ -4,6 +4,9 @@ import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
 import com.openpaw.votify.service.VoteService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +31,12 @@ public class VoteController {
     }
 
     @PostMapping("/api/votes")
-    public ResponseEntity<AnonymousVote> addVote(@RequestBody AnonymousVote.Params params) {
+    public ResponseEntity<AnonymousVote> addVote(@Valid @RequestBody AnonymousVote.Params params) {
         return ResponseEntity.status(201).body(voteService.addVote(params));
     }
 
     @PostMapping("/api/vote")
-    public ResponseEntity<VoteResponse> addVoteWithCriteria(@RequestBody VoteResponse.Params params) {
+    public ResponseEntity<VoteResponse> addVoteWithCriteria(@Valid @RequestBody VoteResponse.Params params) {
         return ResponseEntity.status(201).body(voteService.addVoteWithCriteria(params));
     }
 

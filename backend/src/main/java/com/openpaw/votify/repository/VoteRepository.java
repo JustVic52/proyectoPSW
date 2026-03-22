@@ -33,6 +33,7 @@ public class VoteRepository {
         vote.setVotingSessionId(UUID.fromString(rs.getString("voting_session_id")));
         vote.setComment(rs.getString("comment"));
         vote.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        vote.setScore(rs.getInt("score"));
         return vote;
     }
 
@@ -61,12 +62,14 @@ public class VoteRepository {
 
     public Vote add(AnonymousVote.Params params) {
         if (isCommentShortEnough(params.comment())) {
-            String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment) VALUES (?::uuid, ?::uuid, ?::uuid, ?) RETURNING *";
+            String sql = "INSERT INTO votes (voter_id, project_id, voting_session_id, comment, score) VALUES (?::uuid, ?::uuid, ?::uuid, ?, ?) RETURNING *";
             return jdbcTemplate.queryForObject(sql, this::mapRow,
                     Vote.PLACEHOLDER_VOTER_ID.toString(),
                     params.projectId().toString(),
                     params.votingSessionId().toString(),
-                    params.comment());
+                    params.comment(),
+                    params.score()
+                );
         }
         else { throw new LengthExceededException("Comment is too long; 500 characters max."); }
     }
@@ -79,7 +82,8 @@ public class VoteRepository {
         Vote vote = add(new AnonymousVote.Params(
                 params.projectId(),
                 params.votingSessionId(),
-                params.comment()));
+                params.comment(),
+                params.score()));
 
         List<CriterionValue> criterionValues = new ArrayList<>();
         String cvSql = "INSERT INTO criterion_values (vote_id, criterion_id, numeric_value) VALUES (?::uuid, ?::uuid, ?) RETURNING *";
