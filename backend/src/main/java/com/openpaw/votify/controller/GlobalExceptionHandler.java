@@ -1,5 +1,6 @@
 package com.openpaw.votify.controller;
 
+import com.openpaw.votify.exception.DuplicateVoteException;
 import com.openpaw.votify.exception.ErrorResponse;
 import com.openpaw.votify.exception.LengthExceededException;
 import com.openpaw.votify.exception.NotFoundException;
@@ -40,6 +41,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LengthExceededException.class)
     public ResponseEntity<ErrorResponse> handleLength(LengthExceededException e) {
+        return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(DuplicateVoteException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateVote(DuplicateVoteException e) {
         return ResponseEntity.status(400).body(new ErrorResponse(e.getMessage()));
     }
 }

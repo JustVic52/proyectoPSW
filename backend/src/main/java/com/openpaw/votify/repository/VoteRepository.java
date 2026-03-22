@@ -100,4 +100,10 @@ public class VoteRepository {
         jdbcTemplate.update(sql, id.toString());
         return vote;
     }
+    
+    public boolean existsByVoterIdAndCategoryId(UUID voterId, UUID categoryId) {
+        String sql = "SELECT COUNT(*) FROM votes v JOIN voting_sessions vs ON v.voting_session_id = vs.id WHERE v.voter_id = ?::uuid AND vs.category_id = ?::uuid";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, voterId.toString(), categoryId.toString());
+        return count != null && count > 0;
+    } 
 }
