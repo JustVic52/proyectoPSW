@@ -62,4 +62,16 @@ public class CriterionValueRepository {
         jdbcTemplate.update(sql, id.toString());
         return cv;
     }
+
+    public Double calculateVoteScore(UUID voteId) {
+        String sql = """
+            SELECT SUM(cv.numeric_value * c.weight)
+            FROM criterion_values cv
+            JOIN criteria c ON cv.criterion_id = c.id
+            WHERE cv.vote_id = ?::uuid
+            """;
+
+        Double score = jdbcTemplate.queryForObject(sql, Double.class, voteId.toString());
+        return score != null ? score : 0.0;
+    }
 }

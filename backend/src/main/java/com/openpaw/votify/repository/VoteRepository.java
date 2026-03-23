@@ -105,5 +105,16 @@ public class VoteRepository {
         String sql = "SELECT COUNT(*) FROM votes v JOIN voting_sessions vs ON v.voting_session_id = vs.id WHERE v.voter_id = ?::uuid AND vs.category_id = ?::uuid";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, voterId.toString(), categoryId.toString());
         return count != null && count > 0;
-    } 
+    }
+
+    public List<Vote> findByProjectIdAndVotingSessionId(UUID projectId, UUID votingSessionId) {
+        String sql = """
+            SELECT *
+            FROM votes
+            WHERE project_id = ?::uuid
+            AND voting_session_id = ?::uuid
+            """;
+
+        return jdbcTemplate.query(sql, this::mapRow, projectId.toString(), votingSessionId.toString());
+    }
 }
