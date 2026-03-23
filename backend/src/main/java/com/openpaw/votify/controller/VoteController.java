@@ -41,4 +41,14 @@ public class VoteController {
     public ResponseEntity<Vote> removeVote(@PathVariable UUID id) {
         return ResponseEntity.ok(voteService.removeVote(id));
     }
+
+    @GetMapping("/api/votes/{id}/score")
+    public ResponseEntity<Double> getVoteScore(@PathVariable UUID id) {
+        return ResponseEntity.ok(voteService.getVoteScore(id));
+    }
+
+    @GetMapping("/api/projects/{projectId}/sessions/{votingSessionId}/score")
+    public ResponseEntity<Double> getProjectFinalScore(@PathVariable UUID projectId, @PathVariable UUID votingSessionId) {
+        return ResponseEntity.ok(voteService.getProjectFinalScore(projectId, votingSessionId));
+    }
 }

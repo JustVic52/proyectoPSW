@@ -6,6 +6,7 @@ import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
 import com.openpaw.votify.model.VotingSession;
+import com.openpaw.votify.repository.CriterionValueRepository;
 import com.openpaw.votify.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class VoteService {
 
     @Autowired
     private VoteRepository voteRepository;
+
+    @Autowired
+    private CriterionValueRepository criterionValueRepository;
 
     @Autowired
     private VoteFactory voteFactory;
@@ -60,5 +64,22 @@ public class VoteService {
     public Vote removeVote(UUID id) {
         Vote vote = voteRepository.remove(id);
         return (Vote) voteFactory.create("full", toMap(vote));
+    }
+
+    public double getVoteScore(UUID voteId) {
+        return criterionValueRepository.calculateVoteScore(voteId);
+    }
+
+    public double getProjectFinalScore(UUID projectId, UUID votingSessionId) {
+        List<Vote> votes = voteRepository.findByProjectIdAndVotingSessionId(projectId, votingSessionId);
+
+        if (votes.isEmpty()) {
+            return 0.0;
+        }
+
+        return votes.stream()
+            .mapToDouble(vote -> criterionValueRepository.calculateVoteScore(vote.getId()))
+            .average()
+            .orElse(0.0);
     }
 }
