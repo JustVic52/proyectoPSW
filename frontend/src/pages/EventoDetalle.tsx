@@ -1,9 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, CalendarDays, Info } from "lucide-react";
-import ProjectsList from "@/components/ProjectsList";
 
 // Reuse the mock simply to display title matching URL (Optional real logic comes later)
 const MOCK_EVENT_DETAILS: Record<string, any> = {
@@ -84,37 +82,23 @@ export default function EventoDetalle() {
                     </div>
                 </div>
 
-                <Tabs defaultValue={MOCK_CATEGORIES[0].id} className="w-full">
-                    {/* Reutilizando la barra deslizante o envuelta */}
-                    <div className="overflow-x-auto pb-2 mb-8">
-                        <TabsList className="min-w-max h-12 px-2 bg-muted/50 border border-border/50">
-                            {MOCK_CATEGORIES.map(cat => (
-                                <TabsTrigger 
-                                    key={cat.id} 
-                                    value={cat.id}
-                                    className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-6 h-9"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-semibold">{cat.name}</span>
-                                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 opacity-80 font-normal">
-                                            {cat.type}
-                                        </Badge>
-                                    </div>
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </div>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {MOCK_CATEGORIES.map(cat => (
-                        <TabsContent key={cat.id} value={cat.id} className="m-0 focus-visible:outline-none focus-visible:ring-0">
-                            {/* Renderizar tu componente ProjectsList existente de forma aislada sin modificarlo */}
-                            <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
-                                {/* The original component doesn't take props yet by your rules, so we just render it. The visual separation implies scope implicitly. */}
-                                <ProjectsList />
+                        <div 
+                            key={cat.id} 
+                            onClick={() => navigate(`/eventos/${id}/categorias/${cat.id}`)}
+                            className="bg-card border rounded-xl p-5 cursor-pointer hover:shadow-md transition-all hover:border-primary/50 group flex flex-col h-full"
+                        >
+                            <div className="flex justify-between items-start mb-3">
+                                <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{cat.name}</h3>
+                                <Badge variant="secondary" className="font-normal text-xs">{cat.type}</Badge>
                             </div>
-                        </TabsContent>
+                            <p className="text-sm text-muted-foreground mt-auto">
+                                Ver proyectos y emitir voto
+                            </p>
+                        </div>
                     ))}
-                </Tabs>
+                </div>
             </div>
         </div>
     );

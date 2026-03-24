@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Clock, CheckCircle, Loader2 } from "lucide-react";
 import ProjectDrawer from "./ProjectDrawer";
 import VotingDialog from "./VotingDialog";
-import { toast } from "sonner";
 
 const projectMeta: Record<string, { tag: string }> = {
   "1": { tag: "Educación" },
@@ -50,37 +49,11 @@ export default function ProjectsList() {
     fetchProjects();
   }, []);
 
-  const handleVoteSubmit = (score: number) => {
-    toast(<span className="font-bold">Votify</span>, {
-      description: (
-        <span className="text-black font-normal">
-          🎉 Has votado exitosamente por: "{votingProject?.title}" con una puntuación de: {score} 🎉
-        </span>
-      ),
-    });
-    setVotingProject(null);
-  };
+
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col min-h-full">
-      {/* Header */}
-      <div className="mb-12 animate-fade-up" style={{ animationDelay: "0ms" }}>
-        <Badge
-          variant="outline"
-          className="mb-5 text-primary border-primary/40 bg-primary/8 font-medium tracking-wide uppercase text-[11px] px-3 py-1"
-        >
-          Votación Abierta
-        </Badge>
-        <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4 leading-[1.05]">
-          Proyectos
-          <br />
-          <span className="text-primary">Destacados</span>
-        </h1>
-        <p className="text-base text-muted-foreground max-w-xl leading-relaxed">
-          Descubre y apoya las iniciativas que marcarán la diferencia. Tu voto
-          decide qué proyecto se hace realidad.
-        </p>
-      </div>
+
 
       {/* Grid */}
       {loading ? (
@@ -173,7 +146,6 @@ export default function ProjectsList() {
         isOpen={!!votingProject}
         onClose={() => setVotingProject(null)}
         projectTitle={votingProject?.title || ""}
-        onVoteSubmit={handleVoteSubmit}
       />
     </div>
   );
