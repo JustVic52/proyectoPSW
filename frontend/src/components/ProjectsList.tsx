@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Clock, CheckCircle, Loader2 } from "lucide-react";
 import ProjectDrawer from "./ProjectDrawer";
 import VotingDialog from "./VotingDialog";
-import { toast } from "sonner";
 
 const projectMeta: Record<string, { tag: string }> = {
   "1": { tag: "Educación" },
@@ -29,64 +28,65 @@ const projectMeta: Record<string, { tag: string }> = {
   "4": { tag: "Comunidad" },
 };
 
-export default function ProjectsList() {
+export default function ProjectsList({ categoryId }: { categoryId?: string }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [votingProject, setVotingProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get("http://localhost:8085/api/projects");
+        const url = categoryId 
+          ? `http://localhost:8085/api/categories/${categoryId}/projects`
+          : "http://localhost:8085/api/projects";
+        const response = await axios.get(url);
         setProjects(response.data);
-      } catch (error) {
-        console.error("Error al obtener los proyectos:", error);
+        setError(null);
+      } catch (err) {
+        console.error("Error al obtener los proyectos:", err);
+        setError("Ha ocurrido un error al cargar los proyectos.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProjects();
-  }, []);
+  }, [categoryId]);
 
-  const handleVoteSubmit = (score: number) => {
-    toast(<span className="font-bold">Votify</span>, {
-      description: (
-        <span className="text-black font-normal">
-          🎉 Has votado exitosamente por: "{votingProject?.title}" con una puntuación de: {score} 🎉
-        </span>
-      ),
-    });
-    setVotingProject(null);
-  };
+
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 flex flex-col min-h-full">
-      {/* Header */}
-      <div className="mb-12 animate-fade-up" style={{ animationDelay: "0ms" }}>
-        <Badge
-          variant="outline"
-          className="mb-5 text-primary border-primary/40 bg-primary/8 font-medium tracking-wide uppercase text-[11px] px-3 py-1"
-        >
-          Votación Abierta
-        </Badge>
-        <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4 leading-[1.05]">
-          Proyectos
-          <br />
-          <span className="text-primary">Destacados</span>
-        </h1>
-        <p className="text-base text-muted-foreground max-w-xl leading-relaxed">
-          Descubre y apoya las iniciativas que marcarán la diferencia. Tu voto
-          decide qué proyecto se hace realidad.
-        </p>
-      </div>
+
 
       {/* Grid */}
       {loading ? (
         <div className="flex justify-center items-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-3 text-lg font-medium text-muted-foreground">Cargando proyectos...</span>
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-in">
+          <div className="bg-destructive/10 text-destructive border border-destructive/20 rounded-xl p-6 max-w-md mx-auto">
+            <h3 className="text-lg font-bold mb-2">¡Oops! Algo ha ido mal</h3>
+            <p className="text-sm">{error}</p>
+            <Button variant="outline" className="mt-4 border-destructive/30 hover:bg-destructive/10" onClick={() => window.location.reload()}>
+              Reintentar
+            </Button>
+          </div>
+        </div>
+      ) : projects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in bg-card border-2 border-dashed border-border/80 rounded-2xl mx-auto w-full px-6 shadow-sm">
+          <div className="bg-muted w-16 h-16 rounded-full flex items-center justify-center mb-4 text-muted-foreground/60">
+            {/* simple icon indicating document or emptiness */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-file-x-2"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m3 11.5 6 6"/><path d="m3 17.5 6-6"/></svg>
+          </div>
+          <h3 className="text-xl font-bold mb-2 text-foreground">No hay proyectos actualmente</h3>
+          <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
+            Aún no hay ningún proyecto disponible en esta categoría. Vuelve a revisar más adelante cuando los creadores hayan enviado sus propuestas.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -173,7 +173,6 @@ export default function ProjectsList() {
         isOpen={!!votingProject}
         onClose={() => setVotingProject(null)}
         projectTitle={votingProject?.title || ""}
-        onVoteSubmit={handleVoteSubmit}
       />
     </div>
   );

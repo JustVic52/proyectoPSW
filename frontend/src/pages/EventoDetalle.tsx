@@ -1,9 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, CalendarDays, Info } from "lucide-react";
-import ProjectsList from "@/components/ProjectsList";
+
+interface Category {
+    id: string;
+    name: string;
+    createdAt: string;
+}
 
 // Reuse the mock simply to display title matching URL (Optional real logic comes later)
 const MOCK_EVENT_DETAILS: Record<string, any> = {
@@ -24,15 +30,29 @@ const MOCK_EVENT_DETAILS: Record<string, any> = {
     }
 };
 
-const MOCK_CATEGORIES = [
-    { id: "cat-1", name: "Proyectos Sociales", type: "Voto Público" },
-    { id: "cat-2", name: "Innovación Tecnológica", type: "Voto Jurado" },
-    { id: "cat-3", name: "Sostenibilidad", type: "Voto Mixto" },
-];
-
 export default function EventoDetalle() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.get('http://localhost:8085/api/categories');
+                setCategories(response.data);
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching categories:", err);
+                setError("Error al cargar las categorías. Por favor, inténtalo de nuevo.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, []);
     
     const event = MOCK_EVENT_DETAILS[id as string] || MOCK_EVENT_DETAILS["default"];
 
@@ -84,37 +104,38 @@ export default function EventoDetalle() {
                     </div>
                 </div>
 
-                <Tabs defaultValue={MOCK_CATEGORIES[0].id} className="w-full">
-                    {/* Reutilizando la barra deslizante o envuelta */}
-                    <div className="overflow-x-auto pb-2 mb-8">
-                        <TabsList className="min-w-max h-12 px-2 bg-muted/50 border border-border/50">
-                            {MOCK_CATEGORIES.map(cat => (
-                                <TabsTrigger 
-                                    key={cat.id} 
-                                    value={cat.id}
-                                    className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-6 h-9"
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-semibold">{cat.name}</span>
-                                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 opacity-80 font-normal">
-                                            {cat.type}
-                                        </Badge>
-                                    </div>
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
+                {loading ? (
+                    <div className="flex justify-center items-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
-
-                    {MOCK_CATEGORIES.map(cat => (
-                        <TabsContent key={cat.id} value={cat.id} className="m-0 focus-visible:outline-none focus-visible:ring-0">
-                            {/* Renderizar tu componente ProjectsList existente de forma aislada sin modificarlo */}
-                            <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
-                                {/* The original component doesn't take props yet by your rules, so we just render it. The visual separation implies scope implicitly. */}
-                                <ProjectsList />
+                ) : error ? (
+                    <div className="text-center py-12 text-destructive bg-destructive/10 rounded-xl border border-destructive/20">
+                        <p>{error}</p>
+                        <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>Reintentar</Button>
+                    </div>
+                ) : categories.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border">
+                        <p>No hay categorías disponibles en este momento.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {categories.map(cat => (
+                            <div 
+                                key={cat.id} 
+                                onClick={() => navigate(`/eventos/${id}/categorias/${cat.id}`)}
+                                className="bg-card border rounded-xl p-5 cursor-pointer hover:shadow-md transition-all hover:border-primary/50 group flex flex-col h-full"
+                            >
+                                <div className="flex justify-between items-start mb-3">
+                                    <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{cat.name}</h3>
+                                    <Badge variant="secondary" className="font-normal text-xs">Categoría</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-auto">
+                                    Ver proyectos y emitir voto
+                                </p>
                             </div>
-                        </TabsContent>
-                    ))}
-                </Tabs>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

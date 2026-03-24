@@ -21,11 +21,6 @@ const items = [
         icon: CalendarDays,
     },
     {
-        title: "Proyectos",
-        url: "/",
-        icon: Home,
-    },
-    {
         title: "Rankings",
         url: "/rankings",
         icon: Trophy,

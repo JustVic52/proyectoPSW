@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -46,7 +47,9 @@ export default function VotingDialog({
   const handleConfirmVote = async () => {
     const numericScore = parseFloat(score);
     if (!isNaN(numericScore)) {
-      await axios.post("http://localhost:8085/api/vote", {
+      setShowConfirmAlert(false);
+
+      const votePromise = axios.post("http://localhost:8085/api/vote", {
         projectId: PROJECT_ID,
         votingSessionId: VOTING_SESSION_ID,
         comment,
@@ -54,10 +57,25 @@ export default function VotingDialog({
           { criterionId: CRITERION_ID, numericValue: numericScore },
         ],
       });
-      setScore("");
-      setComment("");
-      setShowConfirmAlert(false);
-      onClose();
+
+      toast.promise(votePromise, {
+        loading: "Registrando tu voto...",
+        success: () => (
+          <span className="text-black font-normal">
+            🎉 Has votado exitosamente. Comentario: "{comment}"
+          </span>
+        ),
+        error: "Hubo un error al procesar tu voto.",
+      });
+
+      try {
+        await votePromise;
+        setScore("");
+        setComment("");
+        onClose();
+      } catch (error) {
+        console.error("Error submitting vote", error);
+      }
     }
   };
 
