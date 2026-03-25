@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import Layout from "./pages/Layout";
-import ProjectsList from "./components/ProjectsList";
-import Rankings from "./pages/Rankings";
+
+
 import Profile from "./pages/Profile";
 import Eventos from "./pages/Eventos";
 import EventoDetalle from "./pages/EventoDetalle";
@@ -17,10 +17,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <Navigate to="/eventos" replace />,
       },
-      {
-        path: "/rankings",
-        element: <Rankings />,
-      },
+
       {
         path: "/profile",
         element: <Profile />,

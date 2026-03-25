@@ -1,4 +1,4 @@
-import { Home, Trophy, CalendarDays } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
     Sidebar,
@@ -20,11 +20,6 @@ const items = [
         url: "/eventos",
         icon: CalendarDays,
     },
-    {
-        title: "Rankings",
-        url: "/rankings",
-        icon: Trophy,
-    },
 ];
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -34,9 +29,21 @@ export default function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon">
-            <SidebarHeader className="border-b border-border/40 pb-4 pt-4 px-4 flex flex-row items-center justify-between group-data-[collapsible=icon]:border-b-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
-                <h2 className="text-lg font-bold tracking-tight group-data-[collapsible=icon]:hidden">Navigation</h2>
-                <SidebarTrigger />
+            <SidebarHeader className="border-b border-border/40 pb-4 pt-4 px-4 flex flex-row items-center justify-between group/header group-data-[collapsible=icon]:border-b-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center relative">
+                <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
+                    <img src="/votify-logo.png" alt="Logo" className="h-8 w-auto shrink-0" />
+                    <h2 className="text-lg font-bold tracking-tight truncate">Votify</h2>
+                </div>
+                
+                {/* Logo visible when collapsed, hidden on hover */}
+                <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center transition-opacity duration-200 group-hover/header:opacity-0">
+                    <img src="/votify-logo.png" alt="Logo" className="h-6 w-6 object-contain" />
+                </div>
+                
+                {/* Trigger: absolute overlay when collapsed, or normal position when expanded */}
+                <div className="group-data-[collapsible=icon]:absolute group-data-[collapsible=icon]:inset-0 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:group-hover/header:opacity-100 transition-opacity">
+                    <SidebarTrigger className="group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8" />
+                </div>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>

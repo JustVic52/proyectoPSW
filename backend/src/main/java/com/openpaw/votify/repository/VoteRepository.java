@@ -3,6 +3,7 @@ package com.openpaw.votify.repository;
 import com.openpaw.votify.exception.NotFoundException;
 import com.openpaw.votify.model.AnonymousVote;
 import com.openpaw.votify.model.CriterionValue;
+import com.openpaw.votify.model.RankingEntry;
 import com.openpaw.votify.model.Vote;
 import com.openpaw.votify.model.VoteResponse;
 import com.openpaw.votify.exception.LengthExceededException;
@@ -116,5 +117,73 @@ public class VoteRepository {
             """;
 
         return jdbcTemplate.query(sql, this::mapRow, projectId.toString(), votingSessionId.toString());
+    }
+
+    public List<RankingEntry> findRankingByCategoryId(UUID categoryId) {
+        String sql = """
+            SELECT
+                p.id          AS project_id,
+                p.title       AS titulo,
+                COUNT(DISTINCT v.id)                                   AS vote_count,
+                COALESCE(AVG(vote_scores.vote_score), 0)               AS score
+            FROM category_projects cp
+            JOIN projects p ON cp.project_id = p.id
+            JOIN voting_sessions vs ON vs.category_id = cp.category_id
+            LEFT JOIN votes v ON v.project_id = p.id AND v.voting_session_id = vs.id
+            LEFT JOIN (
+                SELECT v2.id AS vote_id,
+                       SUM(cv.numeric_value * c.weight) AS vote_score
+                FROM votes v2
+                JOIN criterion_values cv ON cv.vote_id = v2.id
+                JOIN criteria c ON c.id = cv.criterion_id
+                GROUP BY v2.id
+            ) vote_scores ON vote_scores.vote_id = v.id
+            WHERE cp.category_id = ?::uuid
+            GROUP BY p.id, p.title
+            ORDER BY score DESC
+            """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new RankingEntry(
+                UUID.fromString(rs.getString("project_id")),
+                rs.getString("titulo"),
+                rs.getDouble("score"),
+                rs.getInt("vote_count")
+        ), categoryId.toString());
+    }
+
+    public List<RankingEntry> findGlobalRankingByCategoryIds(List<UUID> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) return List.of();
+
+        String placeholders = String.join(", ", categoryIds.stream().map(id -> "?::uuid").toList());
+        String sql = """
+            SELECT
+                p.id          AS project_id,
+                p.title       AS titulo,
+                COUNT(DISTINCT v.id)                                   AS vote_count,
+                COALESCE(AVG(vote_scores.vote_score), 0)               AS score
+            FROM category_projects cp
+            JOIN projects p ON cp.project_id = p.id
+            JOIN voting_sessions vs ON vs.category_id = cp.category_id
+            LEFT JOIN votes v ON v.project_id = p.id AND v.voting_session_id = vs.id
+            LEFT JOIN (
+                SELECT v2.id AS vote_id,
+                       SUM(cv.numeric_value * c.weight) AS vote_score
+                FROM votes v2
+                JOIN criterion_values cv ON cv.vote_id = v2.id
+                JOIN criteria c ON c.id = cv.criterion_id
+                GROUP BY v2.id
+            ) vote_scores ON vote_scores.vote_id = v.id
+            WHERE cp.category_id IN (%s)
+            GROUP BY p.id, p.title
+            ORDER BY score DESC
+            """.formatted(placeholders);
+
+        Object[] args = categoryIds.stream().map(UUID::toString).toArray();
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new RankingEntry(
+                UUID.fromString(rs.getString("project_id")),
+                rs.getString("titulo"),
+                rs.getDouble("score"),
+                rs.getInt("vote_count")
+        ), args);
     }
 }
