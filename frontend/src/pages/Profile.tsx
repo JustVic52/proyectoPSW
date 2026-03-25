@@ -5,9 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, Clock, CalendarDays, Activity, BarChart4, Zap, Lock, Eye, CheckCircle } from "lucide-react";
+import { CheckCircle2, Clock, Activity, BarChart4, Zap, Lock, Eye, CheckCircle, Settings } from "lucide-react";
+import EventConfigDialog from "@/components/EventConfigDialog";
+import { useState } from "react";
 
 export default function Profile() {
+    const [isConfigOpen, setIsConfigOpen] = useState(false);
     return (
         <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
             {/* Header */}
@@ -78,21 +81,10 @@ export default function Profile() {
                                         <Clock className="h-4 w-4 text-primary" />
                                     </div>
                                     <div className="flex-1 space-y-1">
-                                        <p className="text-sm font-medium leading-none">Votación "Innovación Verde" a punto de cerrar</p>
-                                        <p className="text-sm text-muted-foreground">Faltan 2 horas para el cierre.</p>
+                                        <p className="text-sm font-medium leading-none">Votación "Hackathon Ciberseguridad" a punto de cerrar</p>
+                                        <p className="text-sm text-muted-foreground">Faltan 45 minutos para el cierre.</p>
                                     </div>
                                     <div className="font-medium text-sm text-orange-500">Urgente</div>
-                                </div>
-                                <Separator />
-                                <div className="flex items-center">
-                                    <div className="bg-primary/10 p-2 rounded-full mr-4">
-                                        <CalendarDays className="h-4 w-4 text-primary" />
-                                    </div>
-                                    <div className="flex-1 space-y-1">
-                                        <p className="text-sm font-medium leading-none">Nuevo evento: "Tech Startups 2026"</p>
-                                        <p className="text-sm text-muted-foreground">Creado por el comité organizador.</p>
-                                    </div>
-                                    <div className="font-medium text-sm text-muted-foreground">Hace 1 día</div>
                                 </div>
                             </div>
                         </CardContent>
@@ -164,17 +156,10 @@ export default function Profile() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                                <div className="flex items-center justify-between pb-2">
                                     <div>
                                         <p className="font-medium">Hackathon Ciberseguridad</p>
                                         <p className="text-sm text-muted-foreground mt-1">Cierra en: <span className="text-red-500 font-semibold">45 minutos</span></p>
-                                    </div>
-                                    <Button variant="outline" size="sm">Ir a Votar</Button>
-                                </div>
-                                <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                                    <div>
-                                        <p className="font-medium">Premios Emprendimiento Universitario</p>
-                                        <p className="text-sm text-muted-foreground mt-1">Cierra en: 2 días y 4 horas</p>
                                     </div>
                                     <Button variant="outline" size="sm">Ir a Votar</Button>
                                 </div>
@@ -238,9 +223,17 @@ export default function Profile() {
                                             En curso
                                         </span>
                                     </div>
-                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden mt-3">
+                                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden mt-3 mb-4">
                                         <div className="h-full bg-primary rounded-full w-[85%]" />
                                     </div>
+                                    <Button 
+                                        variant="outline" 
+                                        className="w-full gap-2 border-primary/20 hover:bg-primary/5 text-primary"
+                                        onClick={() => setIsConfigOpen(true)}
+                                    >
+                                        <Settings className="h-4 w-4" />
+                                        Configurar Evento
+                                    </Button>
                                 </div>
                             </div>
                         </CardContent>
@@ -313,6 +306,8 @@ export default function Profile() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <EventConfigDialog isOpen={isConfigOpen} onClose={() => setIsConfigOpen(false)} />
         </div>
     );
 }

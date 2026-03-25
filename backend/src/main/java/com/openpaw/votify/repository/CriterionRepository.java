@@ -42,4 +42,9 @@ public class CriterionRepository {
                 params.type().name().toLowerCase(),
                 params.weight());
     }
+
+    public List<Criterion> findByScaleId(UUID scaleId) {
+        String sql = "SELECT * FROM criteria WHERE scale_id = ?";
+        return jdbcTemplate.query(sql, this::mapRow, scaleId);
+    }
 }

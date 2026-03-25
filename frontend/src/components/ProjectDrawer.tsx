@@ -15,9 +15,10 @@ type ProjectDrawerProps = {
     onClose: () => void;
     project: Project | null;
     onVoteClick: () => void;
+    isActive?: boolean;
 };
 
-export default function ProjectDrawer({ isOpen, onClose, project, onVoteClick }: ProjectDrawerProps) {
+export default function ProjectDrawer({ isOpen, onClose, project, onVoteClick, isActive = false }: ProjectDrawerProps) {
     if (!project) return null;
 
     return (
@@ -43,12 +44,14 @@ export default function ProjectDrawer({ isOpen, onClose, project, onVoteClick }:
                             Cancelar
                         </Button>
                     </DrawerClose>
-                    <Button onClick={() => {
-                        onClose();
-                        onVoteClick();
-                    }} className="w-full sm:w-auto">
-                        Votar por este Proyecto
-                    </Button>
+                    {isActive && (
+                        <Button onClick={() => {
+                            onClose();
+                            onVoteClick();
+                        }} className="w-full sm:w-auto">
+                            Votar por este Proyecto
+                        </Button>
+                    )}
                 </DrawerFooter>
             </DrawerContent>
         </Drawer>

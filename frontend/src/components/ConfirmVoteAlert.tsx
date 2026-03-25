@@ -12,7 +12,6 @@ import {
 type ConfirmVoteAlertProps = {
   showConfirmAlert: boolean;
   setShowConfirmAlert: (open: boolean) => void;
-  score: string;
   projectTitle: string;
   comment: string;
   handleConfirmVote: () => void;
@@ -21,7 +20,6 @@ type ConfirmVoteAlertProps = {
 const ConfirmVoteAlert = ({
   showConfirmAlert,
   setShowConfirmAlert,
-  score,
   projectTitle,
   comment,
   handleConfirmVote,
@@ -32,8 +30,7 @@ const ConfirmVoteAlert = ({
         <AlertDialogHeader>
           <AlertDialogTitle>¿Confirmar votación?</AlertDialogTitle>
           <AlertDialogDescription>
-            Estás a punto de enviar un voto con puntuación de{" "}
-            <strong className="text-foreground">{score}</strong> para el
+            Estás a punto de enviar tus valoraciones para el
             proyecto <strong className="text-foreground">{projectTitle}</strong>
             {comment && (
               <>
