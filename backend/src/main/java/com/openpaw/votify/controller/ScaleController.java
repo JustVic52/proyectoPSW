@@ -1,6 +1,7 @@
 package com.openpaw.votify.controller;
 
 import com.openpaw.votify.model.Scale;
+import com.openpaw.votify.model.ScaleWithCriteria;
 import com.openpaw.votify.service.ScaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class ScaleController {
     @GetMapping("/voting-session/{votingSessionId}")
     public ResponseEntity<List<Scale>> getScalesByVotingSessionId(@PathVariable UUID votingSessionId) {
         return ResponseEntity.ok(scaleService.getScalesByVotingSessionId(votingSessionId));
+    }
+
+    @GetMapping("/voting-session/{votingSessionId}/with-criteria")
+    public ResponseEntity<List<ScaleWithCriteria>> getScalesWithCriteriaByVotingSessionId(@PathVariable UUID votingSessionId) {
+        return ResponseEntity.ok(scaleService.getScalesWithCriteriaByVotingSessionId(votingSessionId));
     }
 
     @PostMapping

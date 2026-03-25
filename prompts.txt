@@ -59,3 +59,14 @@ Proyecto (que en tu UML es de many-to-many y en tu DB se refleja en los cruces).
 Review the implementation I completed in the backend.
 Check whether my changes are consistent with the patterns and style already used in this project, and whether they satisfy the ticket requirements: "use existsByUsuarioIdAndCategoriaId in VotoRepository to check in VotoService before doing .save(), if its returns true, GlobalExceptionHandler".
 If any part is not adequate, explain why, propose alternatives, and justify them.
+
+Dentro del dashboard, actualmente tenemos un superusuario y una pestaña 
+donde ve la gestión de eventos, actualmente tenemos eventos fake 
+es decir no estan conectados a backend daado que aun no los hemos 
+implementado, con estos eventos falsos como hackathon de ciberseguridad, 
+deja solo este ultimo elimina los otros dos y haz que dentro del dashboard 
+en la pestaña gestion de eventos, aparezca un boton para configurar el evento 
+y éste te abra una ventana de dialogo donde puedas añadir y eliminar categorias 
+y dentro de estas tambien puedas añadir baremos, estas dos ultimas cosas si que 
+quiero que sean funcionales y 
+modifiquen los datos reales de la BD

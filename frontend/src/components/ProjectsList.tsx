@@ -28,7 +28,7 @@ const projectMeta: Record<string, { tag: string }> = {
   "4": { tag: "Comunidad" },
 };
 
-export default function ProjectsList({ categoryId }: { categoryId?: string }) {
+export default function ProjectsList({ categoryId, isActive = false }: { categoryId?: string, isActive?: boolean }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [votingProject, setVotingProject] = useState<Project | null>(null);
@@ -134,23 +134,28 @@ export default function ProjectsList({ categoryId }: { categoryId?: string }) {
                 </CardContent>
 
                 <CardFooter className="border-t border-border/40 bg-muted/20 justify-between pt-1 [.border-t]:pt-4 pb-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10 text-[13px] font-medium"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setVotingProject(project);
-                    }}
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    Votar
-                  </Button>
+                  {isActive && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10 text-[13px] font-medium"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setVotingProject(project);
+                      }}
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Votar
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-1.5 text-[13px] border-border/60 hover:border-primary/50 hover:bg-primary/8 hover:text-primary transition-all"
-                    onClick={() => setSelectedProject(project)}
+                    className="gap-1.5 text-[13px] border-border/60 hover:border-primary/50 hover:bg-primary/8 hover:text-primary transition-all ml-auto"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProject(project);
+                    }}
                   >
                     Detalles
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -167,12 +172,13 @@ export default function ProjectsList({ categoryId }: { categoryId?: string }) {
         onClose={() => setSelectedProject(null)}
         project={selectedProject}
         onVoteClick={() => setVotingProject(selectedProject)}
+        isActive={isActive}
       />
 
       <VotingDialog
         isOpen={!!votingProject}
         onClose={() => setVotingProject(null)}
-        projectTitle={votingProject?.title || ""}
+        project={votingProject}
       />
     </div>
   );
