@@ -1,19 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { categoriesApi, votingSessionsApi, rankingsApi, type RankingEntry } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Trophy } from "lucide-react";
 import ProjectsList from "@/components/ProjectsList";
-
-interface RankingEntry {
-    projectId: string;
-    titulo: string;
-    score: number;
-    voteCount: number;
-}
 
 const medals = ["🥇", "🥈", "🥉"];
 const scoreColor = (score: number) => {
@@ -33,12 +26,12 @@ export default function CategoriaDetalle() {
 
     useEffect(() => {
         if (categoryId) {
-            axios.get(`http://localhost:8085/api/categories/${categoryId}`)
+            categoriesApi.getById(categoryId)
                 .then(res => setCategoryName(res.data.name))
                 .catch(err => console.error("Error fetching category:", err));
 
             // Fetch category status
-            axios.get(`http://localhost:8085/api/voting-sessions/category/${categoryId}`)
+            votingSessionsApi.getByCategory(categoryId)
                 .then(res => {
                     const session = res.data[0];
                     if (!session) {
@@ -72,7 +65,7 @@ export default function CategoriaDetalle() {
     const fetchRanking = () => {
         if (!categoryId) return;
         setRankingLoading(true);
-        axios.get(`http://localhost:8085/api/rankings/category/${categoryId}`)
+        rankingsApi.getByCategory(categoryId)
             .then(res => setRanking(res.data))
             .catch(err => console.error("Error fetching ranking:", err))
             .finally(() => setRankingLoading(false));
