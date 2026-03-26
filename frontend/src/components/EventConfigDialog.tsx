@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useTransition } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { categoriesApi, votingSessionsApi, scalesApi, criteriaApi, type VotingSession } from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Settings, ChevronRight, ChevronDown } from "lucide-react";
+import { Trash2, Plus, Settings, ChevronRight, ChevronDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-interface Category { id: string; name: string; }
-interface VotingSession { id: string; categoryId: string; }
-interface Scale { id: string; description: string; }
-interface Criterion { id: string; name: string; weight: number; type: string; }
+type Category = { id: string; name: string; };
+type Scale = { id: string; description: string; };
+type Criterion = { id: string; name: string; weight: number; type: string; };
 
 export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
     const [categories, setCategories] = useState<Category[]>([]);
+    const [loadingCategories, startCategoriesTransition] = useTransition();
+    const [loadingExpanded, startExpandedTransition] = useTransition();
     const [newCategoryName, setNewCategoryName] = useState("");
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
@@ -34,19 +35,21 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
         }
     }, [isOpen]);
 
-    const fetchCategories = async () => {
-        try {
-            const res = await axios.get('http://localhost:8085/api/categories');
-            setCategories(res.data);
-        } catch (err) {
-            toast.error("Error al cargar categorías");
-        }
+    const fetchCategories = () => {
+        startCategoriesTransition(async () => {
+            try {
+                const res = await categoriesApi.getAll();
+                setCategories(res.data);
+            } catch (err) {
+                toast.error("Error al cargar categorías");
+            }
+        });
     };
 
     const handleAddCategory = async () => {
         if (!newCategoryName.trim()) return;
         try {
-            await axios.post('http://localhost:8085/api/categories', { name: newCategoryName });
+            await categoriesApi.create(newCategoryName);
             setNewCategoryName("");
             fetchCategories();
             toast.success("Categoría creada");
@@ -58,7 +61,7 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
     const handleDeleteCategory = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
         try {
-            await axios.delete(`http://localhost:8085/api/categories/${id}`);
+            await categoriesApi.delete(id);
             if (expandedCategory === id) setExpandedCategory(null);
             fetchCategories();
             toast.success("Categoría eliminada");
@@ -75,20 +78,21 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
         setExpandedCategory(id);
         setVotingSession(null);
         setScales([]);
-        
-        try {
-            // Check for voting session
-            const res = await axios.get(`http://localhost:8085/api/voting-sessions/category/${id}`);
-            const session = res.data[0];
-            if (session) {
-                setVotingSession(session);
-                setEditStart(new Date(session.startTime).toISOString().slice(0, 16));
-                setEditEnd(new Date(session.endTime).toISOString().slice(0, 16));
-                loadScalesWithCriteria(session.id);
+
+        startExpandedTransition(async () => {
+            try {
+                const res = await votingSessionsApi.getByCategory(id);
+                const session = res.data[0];
+                if (session) {
+                    setVotingSession(session);
+                    setEditStart(new Date(session.startTime).toISOString().slice(0, 16));
+                    setEditEnd(new Date(session.endTime).toISOString().slice(0, 16));
+                    loadScalesWithCriteria(session.id);
+                }
+            } catch (err) {
+                console.error(err);
             }
-        } catch (err) {
-            console.error(err);
-        }
+        });
     };
 
     const handleEnableVoting = async (categoryId: string) => {
@@ -97,13 +101,13 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
             const end = new Date();
             end.setDate(end.getDate() + 7); // 7 days from now default
             
-            const res = await axios.post(`http://localhost:8085/api/voting-sessions`, {
-                categoryId: categoryId,
+            const res = await votingSessionsApi.create({
+                categoryId,
                 votingType: "SCORE_BASED",
                 canVoteOwnProject: false,
                 startTime: start.toISOString(),
-                endTime: end.toISOString()
-            });
+                endTime: end.toISOString(),
+            } as VotingSession);
             const session = res.data;
             setVotingSession(session);
             setEditStart(new Date(session.startTime).toISOString().slice(0, 16));
@@ -119,11 +123,7 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
         try {
             const start = new Date(editStart).toISOString();
             const end = new Date(editEnd).toISOString();
-            await axios.put(`http://localhost:8085/api/voting-sessions/${votingSession.id}`, {
-                ...votingSession,
-                startTime: start,
-                endTime: end
-            });
+            await votingSessionsApi.update(votingSession.id, { ...votingSession, startTime: start, endTime: end });
             toast.success("Fechas actualizadas");
         } catch (err) {
             toast.error("Error al actualizar fechas");
@@ -135,10 +135,7 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
     const handleAddScale = async () => {
         if (!newScaleDesc.trim() || !votingSession) return;
         try {
-            const res = await axios.post('http://localhost:8085/api/scales', {
-                votingSessionId: votingSession.id,
-                description: newScaleDesc
-            });
+            const res = await scalesApi.create({ votingSessionId: votingSession.id, description: newScaleDesc });
             setNewScaleDesc("");
             setScales([...scales, res.data]);
             toast.success("Barémo añadido");
@@ -151,7 +148,7 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
 
     const loadScalesWithCriteria = async (sessionId: string) => {
         try {
-            const res = await axios.get(`http://localhost:8085/api/scales/voting-session/${sessionId}/with-criteria`);
+            const res = await scalesApi.getWithCriteria(sessionId);
             // data is List<ScaleWithCriteria>
             const mappedScales: Scale[] = [];
             const mappedCriteria: Record<string, Criterion[]> = {};
@@ -189,11 +186,11 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
         }
 
         try {
-            const res = await axios.post('http://localhost:8085/api/criteria', {
-                scaleId: scaleId,
+            const res = await criteriaApi.create({
+                scaleId,
                 name: newCriterion.name,
                 type: newCriterion.type.toUpperCase(),
-                weight: newWeightDecimal
+                weight: newWeightDecimal,
             });
             
             setCriteriaByScale(prev => ({
@@ -210,7 +207,7 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-5xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Configuración del Evento</DialogTitle>
                     <DialogDescription>
@@ -237,7 +234,14 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
                     {/* Lista de Categorías */}
                     <div className="space-y-3">
                         <h3 className="font-semibold text-lg">Categorías Existentes</h3>
-                        {categories.length === 0 && <p className="text-sm text-muted-foreground">No hay categorías configuradas.</p>}
+                        {loadingCategories ? (
+                            <div className="flex items-center gap-2 py-4 text-muted-foreground">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span className="text-sm">Cargando categorías...</span>
+                            </div>
+                        ) : categories.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">No hay categorías configuradas.</p>
+                        ) : null}
                         
                         {categories.map(cat => (
                             <div key={cat.id} className="border rounded-lg overflow-hidden transition-all">
@@ -259,7 +263,12 @@ export default function EventConfigDialog({ isOpen, onClose }: { isOpen: boolean
                                 {/* Contenido Expandido: Baremos (Scales) */}
                                 {expandedCategory === cat.id && (
                                     <div className="p-4 bg-muted/10 border-t">
-                                        {!votingSession ? (
+                                        {loadingExpanded ? (
+                                            <div className="flex items-center gap-2 py-4 text-muted-foreground">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <span className="text-sm">Cargando configuración...</span>
+                                            </div>
+                                        ) : !votingSession ? (
                                             <div className="text-center py-4 space-y-3">
                                                 <p className="text-sm text-muted-foreground">Esta categoría aún no tiene el sistema de votación habilitado.</p>
                                                 <Button variant="outline" onClick={() => handleEnableVoting(cat.id)} className="gap-2 text-primary border-primary/20">

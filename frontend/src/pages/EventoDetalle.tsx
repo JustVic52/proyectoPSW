@@ -1,31 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, CalendarDays, Info, Trophy } from "lucide-react";
-
-interface Category {
-    id: string;
-    name: string;
-    createdAt: string;
-}
-
-interface VotingSession {
-    id: string;
-    categoryId: string;
-    startTime: string;
-    endTime: string;
-}
-
-interface RankingEntry {
-    projectId: string;
-    titulo: string;
-    score: number;
-    voteCount: number;
-}
+import { categoriesApi, votingSessionsApi, rankingsApi, type Category, type VotingSession, type RankingEntry } from "@/services/api";
 
 const MOCK_EVENT_DETAILS: Record<string, any> = {
     "1": {
@@ -63,8 +43,8 @@ export default function EventoDetalle() {
         const fetchData = async () => {
             try {
                 const [categoriesRes, sessionsRes] = await Promise.all([
-                    axios.get('http://localhost:8085/api/categories'),
-                    axios.get('http://localhost:8085/api/voting-sessions')
+                    categoriesApi.getAll(),
+                    votingSessionsApi.getAll(),
                 ]);
                 setCategories(categoriesRes.data);
                 setVotingSessions(sessionsRes.data);
@@ -83,7 +63,7 @@ export default function EventoDetalle() {
         if (cats.length === 0) return;
         const categoryIds = cats.map(c => c.id).join(',');
         setRankingLoading(true);
-        axios.get(`http://localhost:8085/api/rankings/global?categoryIds=${categoryIds}`)
+        rankingsApi.getGlobal(categoryIds)
             .then(res => setGlobalRanking(res.data))
             .catch(err => console.error("Error fetching global ranking:", err))
             .finally(() => setRankingLoading(false));

@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { projectsApi, categoriesApi, type Project } from "@/services/api";
 
-export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-}
+export type { Project };
 import {
   Card,
   CardContent,
@@ -38,10 +33,9 @@ export default function ProjectsList({ categoryId, isActive = false }: { categor
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const url = categoryId 
-          ? `http://localhost:8085/api/categories/${categoryId}/projects`
-          : "http://localhost:8085/api/projects";
-        const response = await axios.get(url);
+        const response = categoryId
+          ? await categoriesApi.getProjects(categoryId)
+          : await projectsApi.getAll();
         setProjects(response.data);
         setError(null);
       } catch (err) {

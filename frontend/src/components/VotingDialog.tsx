@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { toast } from "sonner";
+import { categoryProjectsApi, votingSessionsApi, scalesApi, votesApi } from "@/services/api";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,9 @@ export default function VotingDialog({
   const [showConfirmAlert, setShowConfirmAlert] = useState<boolean>(false);
   const [votingSessionId, setVotingSessionId] = useState<string | null>(null);
   const [criteria, setCriteria] = useState<any[]>([]);
-  const [criterionValues, setCriterionValues] = useState<Record<string, string>>({});
+  const [criterionValues, setCriterionValues] = useState<
+    Record<string, string>
+  >({});
   const [loadingConfig, setLoadingConfig] = useState(false);
 
   useEffect(() => {
@@ -46,20 +48,22 @@ export default function VotingDialog({
       const fetchData = async () => {
         try {
           // 1. Obtener la categoría del proyecto
-          const catRes = await axios.get(`http://localhost:8085/api/category-projects/project/${project.id}`);
-          if (!catRes.data || catRes.data.length === 0) throw new Error("Proyecto no tiene categoría");
+          const catRes = await categoryProjectsApi.getByProject(project.id);
+          if (!catRes.data || catRes.data.length === 0)
+            throw new Error("Proyecto no tiene categoría");
           const categoryId = catRes.data[0].categoryId;
 
           // 2. Obtener la sesión de votación activa para la categoría
-          const sessionRes = await axios.get(`http://localhost:8085/api/voting-sessions/category/${categoryId}`);
-          if (!sessionRes.data || sessionRes.data.length === 0) throw new Error("No hay sesión de votación activa");
+          const sessionRes = await votingSessionsApi.getByCategory(categoryId);
+          if (!sessionRes.data || sessionRes.data.length === 0)
+            throw new Error("No hay sesión de votación activa");
           const session_id = sessionRes.data[0].id;
           setVotingSessionId(session_id);
 
           // 3. Obtener el baremo y criterios
-          const scaleRes = await axios.get(`http://localhost:8085/api/scales/voting-session/${session_id}/with-criteria`);
+          const scaleRes = await scalesApi.getWithCriteria(session_id);
           if (scaleRes.data && scaleRes.data.length > 0) {
-             setCriteria(scaleRes.data[0].criteria || []);
+            setCriteria(scaleRes.data[0].criteria || []);
           }
         } catch (error) {
           console.error("Error cargando configuración de votación:", error);
@@ -67,24 +71,31 @@ export default function VotingDialog({
         } finally {
           setLoadingConfig(false);
         }
-      }
+      };
       fetchData();
     }
   }, [isOpen, project]);
 
   const handleCriterionChange = (criterionId: string, val: string) => {
-    setCriterionValues(prev => ({ ...prev, [criterionId]: val }));
+    setCriterionValues((prev) => ({ ...prev, [criterionId]: val }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (criteria.some(c => !criterionValues[c.id] || isNaN(parseFloat(criterionValues[c.id])))) {
-       toast.error("Por favor completa todos los criterios con valores numéricos válidos.");
-       return;
+    if (
+      criteria.some(
+        (c) =>
+          !criterionValues[c.id] || isNaN(parseFloat(criterionValues[c.id])),
+      )
+    ) {
+      toast.error(
+        "Por favor completa todos los criterios con valores numéricos válidos.",
+      );
+      return;
     }
     if (!comment.trim()) {
-       toast.error("Por favor ingresa un comentario con al menos un carácter.");
-       return;
+      toast.error("Por favor ingresa un comentario con al menos un carácter.");
+      return;
     }
     setShowConfirmAlert(true);
   };
@@ -93,9 +104,9 @@ export default function VotingDialog({
     if (!project || !votingSessionId) return;
     setShowConfirmAlert(false);
 
-    const valuesArray = criteria.map(c => ({
+    const valuesArray = criteria.map((c) => ({
       criterionId: c.id,
-      numericValue: parseFloat(criterionValues[c.id])
+      numericValue: parseFloat(criterionValues[c.id]),
     }));
 
     const payload = {
@@ -105,7 +116,7 @@ export default function VotingDialog({
       criterionValues: valuesArray,
     };
 
-    const votePromise = axios.post("http://localhost:8085/api/vote", payload);
+    const votePromise = votesApi.submit(payload);
 
     toast.promise(votePromise, {
       loading: "Registrando tu voto...",
@@ -138,19 +149,20 @@ export default function VotingDialog({
               <strong className="text-foreground">{project?.title}</strong>.
             </DialogDescription>
           </DialogHeader>
-          
+
           {loadingConfig ? (
-             <div className="flex justify-center items-center py-10">
-               <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
-               <span>Cargando criterios de votación...</span>
-             </div>
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-primary mr-2" />
+              <span>Cargando criterios de votación...</span>
+            </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-6 py-4">
-                
                 {criteria.map((c) => (
                   <div className="flex flex-col gap-2" key={c.id}>
-                    <Label htmlFor={`crit-${c.id}`}>{c.name} {c.weight !== 1.0 && `(Peso: ${c.weight})`}</Label>
+                    <Label htmlFor={`crit-${c.id}`}>
+                      {c.name} {c.weight !== 1.0 && `(Peso: ${c.weight})`}
+                    </Label>
                     <Input
                       id={`crit-${c.id}`}
                       type="number"
@@ -158,7 +170,9 @@ export default function VotingDialog({
                       max="10"
                       step="any"
                       value={criterionValues[c.id] || ""}
-                      onChange={(e) => handleCriterionChange(c.id, e.target.value)}
+                      onChange={(e) =>
+                        handleCriterionChange(c.id, e.target.value)
+                      }
                       placeholder="Ejemplo: 8.5"
                       className="col-span-3"
                       required
@@ -187,7 +201,11 @@ export default function VotingDialog({
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" className="w-full sm:w-auto" disabled={criteria.length === 0}>
+                <Button
+                  type="submit"
+                  className="w-full sm:w-auto"
+                  disabled={criteria.length === 0}
+                >
                   Confirmar Voto
                 </Button>
               </DialogFooter>

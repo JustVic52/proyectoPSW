@@ -7,3 +7,7 @@ refact: improve and simplify factory pattern
 refact: replace manual creating of vote with vote factory
 
 refact: refactor vote classes to have 3 classes
+
+refactor: move all sql queries to a common api interface
+
+refactor: replace loading useStates with useTransition hook
