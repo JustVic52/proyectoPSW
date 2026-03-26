@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Mock events — replace with API call once Event entity exists in backend
 const MOCK_EVENTS = [
@@ -25,6 +26,7 @@ import EventConfigPanel from "@/components/EventConfigPanel";
 import { projectsApi, votesApi, votingSessionsApi, categoriesApi, type Project, type AnonymousVote, type VotingSession, type Category } from "@/services/api";
 
 export default function Profile() {
+    const navigate = useNavigate();
     const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({ "1": true });
 
     const toggleEvent = (id: string) =>
@@ -198,7 +200,7 @@ export default function Profile() {
                                                     </span>
                                                 </p>
                                             </div>
-                                            <Button variant="outline" size="sm">Ir a Votar</Button>
+                                            <Button variant="outline" size="sm" onClick={() => navigate(`/eventos/1/categorias/${session.categoryId}`)}>Ir a Votar</Button>
                                         </div>
                                     ))}
                                 </div>
@@ -216,7 +218,7 @@ export default function Profile() {
                                 <p className="text-sm text-muted-foreground">No hay votos registrados.</p>
                             ) : (
                                 <div className="space-y-4">
-                                    {votes.map((vote, index) => (
+                                    {[...votes].reverse().map((vote, index) => (
                                         <div key={vote.id}>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
