@@ -44,7 +44,7 @@ public class CategoryProjectRepository {
 
     public List<CategoryProject> findByCategoryId(UUID categoryId) {
         String sql = "SELECT * FROM category_projects WHERE category_id = ?::uuid";
-        return jdbcTemplate.query(sql, this::mapRow, categoryId.toString());
+        return jdbcTemplate.query(sql, this::mapRow, categoryId);
     }
 
     public List<CategoryProject> findByProjectId(UUID projectId) {
